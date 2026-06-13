@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supply &amp; Demand Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#e9edf1;
+    --surface:#ffffff;
+    --surface-2:#f5f7f9;
+    --ink:#15212e;
+    --muted:#62717f;
+    --faint:#93a1ae;
+    --line:#d6dde4;
+    --grid:#e7ecf1;
+
+    --demand:#1b6fb3;        /* consumers / demand */
+    --demand-fill:rgba(27,111,179,0.16);
+    --supply:#e0871c;        /* producers / supply */
+    --supply-fill:rgba(224,135,28,0.20);
+    --equil:#0e1c29;
+    --revenue:#1f9d57;       /* tax revenue */
+    --revenue-fill:rgba(31,157,87,0.22);
+    --cost:#7c4ddb;          /* subsidy cost */
+    --cost-fill:rgba(124,77,219,0.20);
+    --dwl:#d8392f;           /* deadweight loss */
+    --dwl-fill:rgba(216,57,47,0.26);
+
+    --r:14px;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+    --disp:"Space Grotesk",sans-serif;
+    --body:"Inter",system-ui,sans-serif;
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:
+      radial-gradient(1200px 600px at 80% -10%, #f3f6f9 0%, rgba(243,246,249,0) 60%),
+      var(--bg);
+    color:var(--ink);
+    font-family:var(--body);
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+    padding:24px 20px 48px;
+  }
+  .wrap{max-width:1180px;margin:0 auto}
+
+  header.top{
+    display:flex;align-items:flex-end;justify-content:space-between;
+    gap:20px;flex-wrap:wrap;margin-bottom:18px;
+  }
+  .brand .eyebrow{
+    font-family:var(--mono);font-size:11px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--supply);font-weight:600;margin:0 0 6px;
+  }
+  .brand h1{
+    font-family:var(--disp);font-weight:700;font-size:clamp(26px,4vw,40px);
+    letter-spacing:-.02em;margin:0;line-height:1;
+  }
+  .brand p{margin:8px 0 0;color:var(--muted);font-size:14px;max-width:46ch}
+
+  .modeswitch{display:flex;background:var(--surface);border:1px solid var(--line);
+    border-radius:999px;padding:4px;gap:2px;box-shadow:0 1px 2px rgba(20,33,46,.04)}
+  .modeswitch button{
+    font-family:var(--disp);font-weight:600;font-size:13px;border:0;background:none;
+    color:var(--muted);padding:8px 16px;border-radius:999px;cursor:pointer;transition:.18s;
+    letter-spacing:.01em;
+  }
+  .modeswitch button[aria-pressed="true"]{background:var(--ink);color:#fff}
+  .modeswitch button:focus-visible{outline:2px solid var(--demand);outline-offset:2px}
+
+  .layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,.95fr);
+    gap:18px;align-items:start}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+    box-shadow:0 1px 2px rgba(20,33,46,.04)}
+
+  /* ---- graph ---- */
+  .graphcard{padding:14px 14px 6px}
+  .graphhead{display:flex;justify-content:space-between;align-items:center;
+    padding:2px 6px 10px;gap:10px;flex-wrap:wrap}
+  .graphhead .title{font-family:var(--disp);font-weight:600;font-size:14px}
+  .layers{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{font-family:var(--mono);font-size:11px;border:1px solid var(--line);
+    background:var(--surface-2);color:var(--muted);border-radius:999px;
+    padding:5px 10px 5px 8px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+    transition:.15s;user-select:none}
+  .chip .dot{width:9px;height:9px;border-radius:3px;background:var(--faint);transition:.15s}
+  .chip[aria-pressed="true"]{color:var(--ink);background:#fff;border-color:#c4ccd4}
+  .chip[data-k="cs"][aria-pressed="true"] .dot{background:var(--demand)}
+  .chip[data-k="ps"][aria-pressed="true"] .dot{background:var(--supply)}
+  .chip[data-k="gov"][aria-pressed="true"] .dot{background:var(--revenue)}
+  .chip[data-k="dwl"][aria-pressed="true"] .dot{background:var(--dwl)}
+  .chip:focus-visible{outline:2px solid var(--demand);outline-offset:2px}
+
+  svg{display:block;width:100%;height:auto;touch-action:none}
+  svg text{font-family:var(--mono);fill:var(--ink)}
+  .reglabel{font-family:var(--disp);font-weight:600}
+  .axis-line{stroke:var(--ink);stroke-width:1.4}
+  .gridline{stroke:var(--grid);stroke-width:1}
+  .curve{fill:none;stroke-width:2.6;stroke-linecap:round}
+  .curve.d{stroke:var(--demand)}
+  .curve.s{stroke:var(--supply)}
+  .curvelabel{font-family:var(--disp);font-weight:700;font-size:13px}
+  .guide{stroke:var(--equil);stroke-width:1;stroke-dasharray:3 4;opacity:.5}
+  .handle{cursor:ns-resize}
+  .badge{fill:#fff;stroke:var(--line)}
+  .degenerate{font-family:var(--disp);font-weight:600;fill:var(--muted)}
+
+  /* ---- controls ---- */
+  .panel{padding:16px 16px 18px;display:flex;flex-direction:column;gap:18px}
+  .sectlabel{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--faint);margin:0 0 2px;font-weight:600}
+
+  .ctrl{margin-top:12px}
+  .ctrl .row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
+  .ctrl label{font-size:13px;font-weight:500;color:var(--ink)}
+  .ctrl .val{font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--muted)}
+  .ctrl .hint{font-size:11px;color:var(--faint);margin:2px 0 0}
+
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;
+    background:transparent;cursor:pointer;margin:0}
+  input[type=range]::-webkit-slider-runnable-track{height:5px;border-radius:4px;
+    background:linear-gradient(var(--trk,#cdd6de),var(--trk,#cdd6de))}
+  input[type=range]::-moz-range-track{height:5px;border-radius:4px;background:#cdd6de}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+    width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid var(--thumb,var(--ink));
+    margin-top:-6px;box-shadow:0 1px 3px rgba(20,33,46,.18);transition:transform .12s}
+  input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;background:#fff;
+    border:2.5px solid var(--thumb,var(--ink));box-shadow:0 1px 3px rgba(20,33,46,.18)}
+  input[type=range]:active::-webkit-slider-thumb{transform:scale(1.12)}
+  input[type=range]:focus-visible::-webkit-slider-thumb{outline:2px solid var(--demand);outline-offset:2px}
+
+  .grp-d input[type=range]{--thumb:var(--demand)}
+  .grp-s input[type=range]{--thumb:var(--supply)}
+  .grp-t input[type=range]{--thumb:var(--ink)}
+
+  .presets{display:flex;gap:6px;flex-wrap:wrap}
+  .presets button{font-family:var(--body);font-size:12px;font-weight:500;
+    border:1px solid var(--line);background:var(--surface-2);color:var(--ink);
+    border-radius:9px;padding:7px 11px;cursor:pointer;transition:.15s}
+  .presets button:hover{background:#fff;border-color:#bcc6cf}
+  .presets button:focus-visible{outline:2px solid var(--demand);outline-offset:2px}
+
+  /* ---- readouts ---- */
+  .readwrap{margin-top:4px}
+  .insight{background:linear-gradient(180deg,#fbfcfd,#f4f7f9);border:1px solid var(--line);
+    border-radius:12px;padding:13px 14px;font-size:13.5px;line-height:1.5;color:var(--ink)}
+  .insight b{font-weight:600}
+  .insight .lead{font-family:var(--disp);font-weight:600;display:block;margin-bottom:3px;font-size:12px;
+    text-transform:uppercase;letter-spacing:.12em;color:var(--faint)}
+
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:9px}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:11px 12px}
+  .stat .k{font-size:11px;color:var(--muted);font-weight:500;display:flex;align-items:center;gap:6px}
+  .stat .k .sw{width:8px;height:8px;border-radius:2px;flex:none}
+  .stat .v{font-family:var(--mono);font-weight:600;font-size:19px;letter-spacing:-.01em;margin-top:3px}
+  .stat .sub{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:1px}
+  .stat.wide{grid-column:1 / -1}
+
+  /* burden bar */
+  .burden{margin-top:3px}
+  .burden .track{height:24px;border-radius:7px;overflow:hidden;display:flex;border:1px solid var(--line)}
+  .burden .seg{display:flex;align-items:center;justify-content:center;font-family:var(--mono);
+    font-size:11px;font-weight:600;color:#fff;transition:width .2s ease}
+  .burden .seg.c{background:var(--demand)}
+  .burden .seg.p{background:var(--supply)}
+  .burden .lab{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:5px}
+
+  details.welfare{margin-top:10px;border:1px solid var(--line);border-radius:11px;background:var(--surface);overflow:hidden}
+  details.welfare summary{cursor:pointer;list-style:none;padding:10px 12px;font-size:12.5px;font-weight:600;
+    color:var(--ink);display:flex;justify-content:space-between;align-items:center}
+  details.welfare summary::-webkit-details-marker{display:none}
+  details.welfare summary .caret{transition:.2s;color:var(--faint)}
+  details.welfare[open] summary .caret{transform:rotate(90deg)}
+  .wtable{padding:0 12px 12px;font-family:var(--mono);font-size:12px}
+  .wrow{display:grid;grid-template-columns:1fr auto auto;gap:8px;padding:6px 0;border-top:1px solid var(--grid);align-items:baseline}
+  .wrow:first-child{border-top:0;color:var(--faint);font-size:10.5px;letter-spacing:.06em}
+  .wrow .neg{color:var(--dwl)}
+  .wrow .pos{color:var(--revenue)}
+  .wrow .nm{font-family:var(--body);font-weight:500}
+
+  footer.foot{margin-top:18px;color:var(--faint);font-size:11.5px;font-family:var(--mono);text-align:center}
+
+  @media (max-width:880px){
+    .layout{grid-template-columns:1fr}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <p class="eyebrow">Microeconomics · Market interventions</p>
+      <h1>Supply &amp; Demand Lab</h1>
+      <p>Drag the curves and the tax wedge to see incidence, revenue, and deadweight loss respond in real time.</p>
+    </div>
+    <div class="modeswitch" role="group" aria-label="Intervention type">
+      <button data-mode="none">No intervention</button>
+      <button data-mode="tax" aria-pressed="true">Tax</button>
+      <button data-mode="subsidy">Subsidy</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- GRAPH -->
+    <section class="card graphcard">
+      <div class="graphhead">
+        <span class="title">Market for a good</span>
+        <div class="layers" id="layers">
+          <button class="chip" data-k="cs" aria-pressed="true"><span class="dot"></span>Consumer surplus</button>
+          <button class="chip" data-k="ps" aria-pressed="true"><span class="dot"></span>Producer surplus</button>
+          <button class="chip" data-k="gov" aria-pressed="true"><span class="dot"></span><span id="govChipLabel">Revenue</span></button>
+          <button class="chip" data-k="dwl" aria-pressed="true"><span class="dot"></span>Deadweight loss</button>
+        </div>
+      </div>
+      <svg id="chart" viewBox="0 0 640 500" role="img" aria-label="Supply and demand diagram"></svg>
+    </section>
+
+    <!-- CONTROLS + READOUTS -->
+    <section class="card panel">
+      <div class="readwrap">
+        <div class="insight" id="insight"></div>
+
+        <div class="stats" id="stats"></div>
+
+        <div class="stat wide burden" id="burdenCard" style="margin-top:9px">
+          <div class="k">Tax burden split</div>
+          <div class="track" style="margin-top:7px">
+            <div class="seg c" id="segC">—</div>
+            <div class="seg p" id="segP">—</div>
+          </div>
+          <div class="lab"><span>Consumers</span><span>Producers</span></div>
+        </div>
+
+        <details class="welfare">
+          <summary><span>Welfare breakdown</span><span class="caret">▸</span></summary>
+          <div class="wtable" id="wtable"></div>
+        </details>
+      </div>
+
+      <div class="grp-d">
+        <p class="sectlabel">Demand</p>
+        <div class="ctrl">
+          <div class="row"><label for="a">Position (shift the curve)</label><span class="val" id="aVal"></span></div>
+          <input type="range" id="a" min="60" max="100" step="1">
+          <p class="hint">Higher = demand shifts right (more wanted at every price).</p>
+        </div>
+        <div class="ctrl">
+          <div class="row"><label for="b">Steepness → elasticity</label><span class="val" id="bVal"></span></div>
+          <input type="range" id="b" min="0.5" max="2" step="0.05">
+          <p class="hint">Steeper = more inelastic demand.</p>
+        </div>
+      </div>
+
+      <div class="grp-s">
+        <p class="sectlabel">Supply</p>
+        <div class="ctrl">
+          <div class="row"><label for="c">Position (shift the curve)</label><span class="val" id="cVal"></span></div>
+          <input type="range" id="c" min="0" max="45" step="1">
+          <p class="hint">Higher = supply shifts left (costlier to produce).</p>
+        </div>
+        <div class="ctrl">
+          <div class="row"><label for="d">Steepness → elasticity</label><span class="val" id="dVal"></span></div>
+          <input type="range" id="d" min="0.4" max="2" step="0.05">
+          <p class="hint">Steeper = more inelastic supply.</p>
+        </div>
+      </div>
+
+      <div class="grp-t" id="taxGroup">
+        <p class="sectlabel" id="taxSectLabel">Per-unit tax</p>
+        <div class="ctrl">
+          <div class="row"><label for="t" id="tLabel">Tax per unit</label><span class="val" id="tVal"></span></div>
+          <input type="range" id="t" min="0" max="40" step="0.5">
+          <p class="hint" id="tHint">Or grab the wedge on the graph and drag.</p>
+        </div>
+      </div>
+
+      <div>
+        <p class="sectlabel">Scenarios</p>
+        <div class="presets" id="presets">
+          <button data-p="default">Reset</button>
+          <button data-p="inelasticD">Inelastic demand</button>
+          <button data-p="elasticD">Elastic demand</button>
+          <button data-p="inelasticS">Inelastic supply</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="foot">Linear demand P = a − b·Q and supply P = c + d·Q · point elasticities measured at the free-market equilibrium</footer>
+</div>
+
+<script>
+(()=>{
+  "use strict";
+
+  // ---------- state ----------
+  const S = { a:100, b:0.8, c:20, d:0.6, t:15, mode:"tax" };
+  const layers = { cs:true, ps:true, gov:true, dwl:true };
+
+  const presets = {
+    default:   {a:100,b:0.8,c:20,d:0.6,t:15},
+    inelasticD:{a:100,b:1.9,c:20,d:0.6,t:15},
+    elasticD:  {a:100,b:0.55,c:20,d:0.6,t:15},
+    inelasticS:{a:100,b:0.8,c:10,d:1.9,t:15}
+  };
+
+  // ---------- economics ----------
+  // intervention `g` is tax (>=0) in tax mode, subsidy (>=0) in subsidy mode, 0 in none.
+  function model(){
+    const {a,b,c,d,mode}=S;
+    const g = mode==="none" ? 0 : S.t;
+    const sign = mode==="subsidy" ? 1 : -1;     // subsidy raises traded Q, tax lowers it
+    const Qe = (a-c)/(b+d);                       // free-market equilibrium
+    const Pe = a - b*Qe;
+    // wedge: consumer price - producer price = -g for tax (+g for subsidy means producer gets more)
+    // tax:    Pc - Pp = +g  ;  subsidy: Pc - Pp = -g
+    const wedge = (mode==="subsidy") ? -g : g;
+    let Q = (a - c - wedge)/(b+d);
+    Q = Math.max(0, Q);
+    const Pc = a - b*Q;          // price consumers pay
+    const Pp = c + d*Q;          // price producers receive  (Pc - Pp = wedge)
+    const gov = g*Q;             // tax revenue (tax) or subsidy outlay (subsidy)
+    // surplus
+    const CS = 0.5*b*Q*Q;
+    const PS = 0.5*d*Q*Q;
+    const CSe= 0.5*b*Qe*Qe;
+    const PSe= 0.5*d*Qe*Qe;
+    const TSe= CSe+PSe;
+    const govSigned = (mode==="subsidy") ? -gov : gov;
+    const TS = CS+PS+govSigned;
+    const DWL= Math.max(0, TSe - TS);
+    // incidence (per unit)
+    const consUnit = Pc - Pe;        // tax: >0 ; subsidy: <0 (consumers gain)
+    const prodUnit = Pe - Pp;        // tax: >0 ; subsidy: <0 (producers gain)
+    const consShare = g>1e-9 ? Math.abs(consUnit)/g : NaN;
+    const prodShare = g>1e-9 ? Math.abs(prodUnit)/g : NaN;
+    // point elasticities at free-market equilibrium
+    const eD = (Qe>1e-9) ? (1/b)*(Pe/Qe) : Infinity;   // |elasticity| of demand
+    const eS = (Qe>1e-9) ? (1/d)*(Pe/Qe) : Infinity;
+    return {a,b,c,d,g,mode,Qe,Pe,Q,Pc,Pp,gov,govSigned,CS,PS,CSe,PSe,TSe,TS,DWL,
+            consUnit,prodUnit,consShare,prodShare,eD,eS,
+            valid:(a>c && Qe>0)};
+  }
+
+  // ---------- geometry ----------
+  const QMAX=120, PMAX=110;
+  const VB={w:640,h:500}, M={l:54,r:22,t:20,b:46};
+  const PW=VB.w-M.l-M.r, PH=VB.h-M.t-M.b;
+  const X = q => M.l + (Math.max(0,Math.min(QMAX,q))/QMAX)*PW;
+  const Y = p => M.t + (1-Math.max(0,Math.min(PMAX,p))/PMAX)*PH;
+  // raw (unclamped) for line endpoints; clipping handled by clipPath
+  const Xr = q => M.l + (q/QMAX)*PW;
+  const Yr = p => M.t + (1-p/PMAX)*PH;
+
+  // ---------- formatting ----------
+  const $ = s=>document.querySelector(s);
+  const money = v => "$"+(Math.abs(v)<10? v.toFixed(1): Math.round(v).toLocaleString());
+  const num   = v => (Math.abs(v)<10? v.toFixed(1): Math.round(v).toLocaleString());
+  const pct   = v => isFinite(v)? Math.round(v*100)+"%" : "—";
+  const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+  // ---------- chart render ----------
+  const chart = $("#chart");
+
+  function poly(pts,fill){
+    const d = pts.map(p=>`${Xr(p[0]).toFixed(1)},${Yr(p[1]).toFixed(1)}`).join(" ");
+    return `<polygon points="${d}" fill="${fill}"/>`;
+  }
+  function centroid(pts){
+    const x=pts.reduce((s,p)=>s+p[0],0)/pts.length;
+    const y=pts.reduce((s,p)=>s+p[1],0)/pts.length;
+    return [x,y];
+  }
+  function regLabel(pts,text,color){
+    const creg=centroid(pts);
+    const cx=Xr(creg[0]), cy=Yr(creg[1]);
+    const wbox=text.length*5.2+10;
+    return `<g><rect class="badge" x="${(cx-wbox/2).toFixed(1)}" y="${(cy-9).toFixed(1)}" width="${wbox.toFixed(1)}" height="17" rx="5"/>`+
+           `<text class="reglabel" x="${cx.toFixed(1)}" y="${(cy+3.5).toFixed(1)}" text-anchor="middle" font-size="10.5" fill="${color}">${text}</text></g>`;
+  }
+
+  function render(){
+    const m = model();
+    let svg = `<defs><clipPath id="plot"><rect x="${M.l}" y="${M.t}" width="${PW}" height="${PH}"/></clipPath></defs>`;
+
+    if(!m.valid){
+      svg += `<rect x="${M.l}" y="${M.t}" width="${PW}" height="${PH}" fill="#fafbfc" stroke="${'#e7ecf1'}"/>`;
+      svg += `<text class="degenerate" x="${VB.w/2}" y="${VB.h/2}" text-anchor="middle" font-size="13">Demand intercept must exceed supply intercept for a market to exist.</text>`;
+      chart.innerHTML=svg; updatePanel(m); return;
+    }
+
+    // gridlines
+    let grid="";
+    for(let q=0;q<=QMAX;q+=20){ grid+=`<line class="gridline" x1="${Xr(q)}" y1="${M.t}" x2="${Xr(q)}" y2="${M.t+PH}"/>`; }
+    for(let p=0;p<=PMAX;p+=20){ grid+=`<line class="gridline" x1="${M.l}" y1="${Yr(p)}" x2="${M.l+PW}" y2="${Yr(p)}"/>`; }
+    svg+=grid;
+
+    // ---- shaded regions (clipped) ----
+    let reg="";
+    const Qtraded = m.Q, Pc=m.Pc, Pp=m.Pp;
+    const showWedge = m.mode!=="none" && m.g>1e-9;
+
+    if(layers.cs){
+      reg += poly([[0,Pc],[0,m.a],[Qtraded,Pc]], "var(--demand-fill)");
+    }
+    if(layers.ps){
+      reg += poly([[0,m.c],[0,Pp],[Qtraded,Pp]], "var(--supply-fill)");
+    }
+    if(layers.gov && showWedge){
+      // rectangle between Pp and Pc, width 0..Qtraded
+      reg += poly([[0,Pp],[0,Pc],[Qtraded,Pc],[Qtraded,Pp]],
+                  m.mode==="subsidy" ? "var(--cost-fill)" : "var(--revenue-fill)");
+    }
+    if(layers.dwl && showWedge){
+      // triangle between traded Q and efficient Q
+      reg += poly([[Qtraded,Pc],[Qtraded,Pp],[m.Qe,m.Pe]], "var(--dwl-fill)");
+    }
+    svg += `<g clip-path="url(#plot)">${reg}</g>`;
+
+    // ---- region labels ----
+    let labs="";
+    if(showWedge){
+      if(layers.gov){
+        const lbl = m.mode==="subsidy" ? "Subsidy cost" : "Tax revenue";
+        const col = m.mode==="subsidy" ? "var(--cost)" : "var(--revenue)";
+        labs += regLabel([[0,Pp],[0,Pc],[Qtraded,Pc],[Qtraded,Pp]], lbl, col);
+      }
+      if(layers.dwl && Math.abs(m.Qe-Qtraded)>3){
+        labs += regLabel([[Qtraded,Pc],[Qtraded,Pp],[m.Qe,m.Pe]], "DWL", "var(--dwl)");
+      }
+    }
+
+    // ---- curves (clipped) ----
+    let curves=`<g clip-path="url(#plot)">`;
+    // demand from Q=0 to Q where P=0  (a/b)
+    curves += `<line class="curve d" x1="${Xr(0)}" y1="${Yr(m.a)}" x2="${Xr(m.a/m.b)}" y2="${Yr(0)}"/>`;
+    // supply from Q=0 (P=c) extending up
+    const supTopQ = Math.min(QMAX, (PMAX-m.c)/m.d);
+    curves += `<line class="curve s" x1="${Xr(0)}" y1="${Yr(m.c)}" x2="${Xr(supTopQ)}" y2="${Yr(m.c+m.d*supTopQ)}"/>`;
+    curves += `</g>`;
+    svg += curves;
+
+    // ---- guide lines + equilibrium ----
+    let guides="";
+    // efficient equilibrium point
+    guides += `<g clip-path="url(#plot)">`;
+    guides += `<line class="guide" x1="${Xr(m.Qe)}" y1="${Yr(m.Pe)}" x2="${Xr(m.Qe)}" y2="${Yr(0)}"/>`;
+    guides += `<line class="guide" x1="${M.l}" y1="${Yr(m.Pe)}" x2="${Xr(m.Qe)}" y2="${Yr(m.Pe)}"/>`;
+    if(showWedge){
+      guides += `<line class="guide" x1="${Xr(Qtraded)}" y1="${Yr(Math.max(Pc,Pp))}" x2="${Xr(Qtraded)}" y2="${Yr(0)}"/>`;
+    }
+    guides += `</g>`;
+    svg += guides;
+
+    // free-market equilibrium dot
+    svg += `<circle cx="${Xr(m.Qe)}" cy="${Yr(m.Pe)}" r="4.5" fill="#fff" stroke="var(--equil)" stroke-width="2"/>`;
+
+    // ---- tax/subsidy wedge + draggable handle ----
+    svg += labs;
+    if(showWedge){
+      const xw=Xr(Qtraded);
+      const yc=Yr(Pc), yp=Yr(Pp);
+      // consumer & producer price dots
+      svg += `<circle cx="${xw}" cy="${yc}" r="4" fill="var(--demand)"/>`;
+      svg += `<circle cx="${xw}" cy="${yp}" r="4" fill="var(--supply)"/>`;
+      // wedge bar
+      svg += `<line x1="${xw}" y1="${yc}" x2="${xw}" y2="${yp}" stroke="var(--equil)" stroke-width="2"/>`;
+      // grab handle (a small rounded bar at the consumer-price end)
+      svg += `<g class="handle" id="grab"><rect x="${xw-13}" y="${(m.mode==='subsidy'?yp:yc)-7}" width="26" height="14" rx="4" fill="#fff" stroke="var(--equil)" stroke-width="1.5"/>`+
+             `<line x1="${xw-5}" y1="${(m.mode==='subsidy'?yp:yc)-2.5}" x2="${xw+5}" y2="${(m.mode==='subsidy'?yp:yc)-2.5}" stroke="var(--muted)" stroke-width="1.2"/>`+
+             `<line x1="${xw-5}" y1="${(m.mode==='subsidy'?yp:yc)+2.5}" x2="${xw+5}" y2="${(m.mode==='subsidy'?yp:yc)+2.5}" stroke="var(--muted)" stroke-width="1.2"/></g>`;
+      // price ticks on axis
+      svg += priceTick(Pc,"var(--demand)","Pc");
+      svg += priceTick(Pp,"var(--supply)","Pp");
+    } else {
+      svg += priceTick(m.Pe,"var(--equil)","P*");
+    }
+
+    // ---- axes ----
+    svg += `<line class="axis-line" x1="${M.l}" y1="${M.t}" x2="${M.l}" y2="${M.t+PH}"/>`;
+    svg += `<line class="axis-line" x1="${M.l}" y1="${M.t+PH}" x2="${M.l+PW}" y2="${M.t+PH}"/>`;
+    // axis numbers
+    for(let p=0;p<=100;p+=20){ svg+=`<text x="${M.l-8}" y="${Yr(p)+3.5}" text-anchor="end" font-size="10" fill="var(--faint)">${p}</text>`; }
+    for(let q=0;q<=120;q+=20){ svg+=`<text x="${Xr(q)}" y="${M.t+PH+16}" text-anchor="middle" font-size="10" fill="var(--faint)">${q}</text>`; }
+    svg += `<text x="${M.l-40}" y="${M.t+10}" font-size="11" font-weight="600" fill="var(--muted)">Price</text>`;
+    svg += `<text x="${M.l+PW}" y="${M.t+PH+34}" text-anchor="end" font-size="11" font-weight="600" fill="var(--muted)">Quantity</text>`;
+
+    // ---- curve labels ----
+    const dLx=Xr(m.a/m.b*0.78), dLy=Yr(m.a-m.b*(m.a/m.b*0.78))-6;
+    svg += `<text class="curvelabel" x="${dLx}" y="${dLy}" fill="var(--demand)" text-anchor="middle">D</text>`;
+    const sLq=Math.min(supTopQ*0.82,QMAX*0.9), sLp=m.c+m.d*sLq;
+    svg += `<text class="curvelabel" x="${Xr(sLq)+10}" y="${Yr(sLp)}" fill="var(--supply)" text-anchor="start">S</text>`;
+
+    chart.innerHTML = svg;
+    attachDrag();
+    updatePanel(m);
+  }
+
+  function priceTick(p,color,label){
+    const y=Yr(p);
+    return `<g><line x1="${M.l-3}" y1="${y}" x2="${M.l+3}" y2="${y}" stroke="${color}" stroke-width="2"/>`+
+           `<text x="${M.l-9}" y="${y+3}" text-anchor="end" font-size="9.5" font-weight="600" fill="${color}">${Math.round(p)}</text></g>`;
+  }
+
+  // ---------- drag the wedge ----------
+  let dragging=false;
+  function attachDrag(){
+    const grab=document.getElementById("grab");
+    if(!grab) return;
+    grab.addEventListener("pointerdown",e=>{ dragging=true; chart.setPointerCapture?.(e.pointerId); e.preventDefault(); });
+  }
+  function pointerToValue(clientY){
+    const rect=chart.getBoundingClientRect();
+    const scale=VB.h/rect.height;
+    const svgY=(clientY-rect.top)*scale;
+    const p = PMAX*(1 - (svgY-M.t)/PH);          // price under the cursor
+    const m=model();
+    // tax = Pc - Pp at the traded Q. With cursor at consumer price end:
+    // approximate target intervention as distance from efficient price, doubled-> map directly:
+    let g;
+    if(S.mode==="subsidy"){ g = (m.Pe - p)*2 * 0; } // placeholder, recompute below
+    // Simpler robust mapping: set traded quantity from cursor price on the *demand* curve,
+    // then back out g = (b+d)*(Qe - Q)  [tax]  or (b+d)*(Q - Qe) [subsidy]
+    let q=(S.a - p)/S.b;                            // quantity at that consumer price on demand
+    q=Math.max(0,Math.min(QMAX,q));
+    if(S.mode==="subsidy"){ g=(S.b+S.d)*(q-m.Qe); }
+    else { g=(S.b+S.d)*(m.Qe-q); }
+    return Math.max(0,Math.min(40,g));
+  }
+  window.addEventListener("pointermove",e=>{
+    if(!dragging) return;
+    S.t = +pointerToValue(e.clientY).toFixed(1);
+    $("#t").value=S.t; syncTrackFills();
+    render();
+  });
+  window.addEventListener("pointerup",()=>{ dragging=false; });
+
+  // ---------- panel ----------
+  function updatePanel(m){
+    // insight sentence
+    const ins=$("#insight");
+    if(!m.valid){ ins.innerHTML=`<span class="lead">Reading</span>No equilibrium: lower the supply position or raise demand.`; }
+    else if(m.mode==="none"){
+      ins.innerHTML=`<span class="lead">Free market</span>Equilibrium at <b>Q* = ${num(m.Qe)}</b>, <b>P* = ${money(m.Pe)}</b>. Demand elasticity |ε| = <b>${isFinite(m.eD)?m.eD.toFixed(2):'∞'}</b>, supply ε = <b>${isFinite(m.eS)?m.eS.toFixed(2):'∞'}</b>. Add a tax or subsidy to see the welfare effects.`;
+    } else if(m.g<1e-9){
+      const word=m.mode==="tax"?"tax":"subsidy";
+      ins.innerHTML=`<span class="lead">${m.mode}</span>Set a ${word} above zero — drag the slider or the wedge — to see incidence and deadweight loss.`;
+    } else if(m.mode==="tax"){
+      const heavier = m.consShare>=m.prodShare?"Consumers":"Producers";
+      const inelHint = m.consShare>=m.prodShare
+        ? "demand is the more inelastic side, so it absorbs more of the tax"
+        : "supply is the more inelastic side, so it absorbs more of the tax";
+      ins.innerHTML=`<span class="lead">Tax incidence</span><b>${heavier}</b> bear the larger share — ${inelHint}. The wedge shrinks trade from <b>${num(m.Qe)}</b> to <b>${num(m.Q)}</b> units, creating <b>${money(m.DWL)}</b> of deadweight loss while raising <b>${money(m.gov)}</b>.`;
+    } else {
+      ins.innerHTML=`<span class="lead">Subsidy</span>The subsidy pushes trade above the efficient level (from <b>${num(m.Qe)}</b> to <b>${num(m.Q)}</b> units). It costs the government <b>${money(m.gov)}</b> and creates <b>${money(m.DWL)}</b> of deadweight loss from overproduction.`;
+    }
+
+    // stat cards
+    const cards=[];
+    cards.push(card("Equilibrium price", m.mode==="none"||m.g<1e-9? money(m.Pe): `${money(m.Pc)} / ${money(m.Pp)}`,
+      m.mode==="none"||m.g<1e-9? "P*" : "consumers pay / producers get", null));
+    cards.push(card("Quantity traded", num(m.Q), m.mode!=="none"&&m.g>1e-9? `efficient: ${num(m.Qe)}`:"units", null));
+
+    if(m.mode!=="none"){
+      const gv = m.mode==="subsidy"? "Subsidy cost":"Tax revenue";
+      const gcol = m.mode==="subsidy"? "var(--cost)":"var(--revenue)";
+      cards.push(card(gv, money(m.gov), `${money(m.g)} × ${num(m.Q)}`, gcol));
+      cards.push(card("Deadweight loss", money(m.DWL), "lost gains from trade", "var(--dwl)"));
+    } else {
+      cards.push(card("Consumer surplus", money(m.CS), null, "var(--demand)"));
+      cards.push(card("Producer surplus", money(m.PS), null, "var(--supply)"));
+    }
+    $("#stats").innerHTML = cards.join("");
+
+    // elasticity card row (always show as wide pair)
+    $("#stats").insertAdjacentHTML("beforeend",
+      `<div class="stat"><div class="k"><span class="sw" style="background:var(--demand)"></span>Demand elasticity</div>`+
+      `<div class="v">${isFinite(m.eD)?m.eD.toFixed(2):'∞'}</div><div class="sub">|%ΔQ / %ΔP| at P*</div></div>`+
+      `<div class="stat"><div class="k"><span class="sw" style="background:var(--supply)"></span>Supply elasticity</div>`+
+      `<div class="v">${isFinite(m.eS)?m.eS.toFixed(2):'∞'}</div><div class="sub">%ΔQ / %ΔP at P*</div></div>`);
+
+    // burden bar
+    const bc=$("#burdenCard");
+    if(m.mode==="tax" && m.g>1e-9){
+      bc.style.display="";
+      const cs=Math.round((m.consShare||0)*100), ps=100-cs;
+      $("#segC").style.width=cs+"%"; $("#segP").style.width=ps+"%";
+      $("#segC").textContent= cs>=14? cs+"%":"";
+      $("#segP").textContent= ps>=14? ps+"%":"";
+    } else { bc.style.display="none"; }
+
+    // welfare table
+    const govLab = m.mode==="subsidy"?"Subsidy cost":"Tax revenue";
+    const rows=[
+      `<div class="wrow"><span>component</span><span>before</span><span>after</span></div>`,
+      wrow("Consumer surplus", m.CSe, m.CS),
+      wrow("Producer surplus", m.PSe, m.PS),
+    ];
+    if(m.mode!=="none"){
+      const after = m.mode==="subsidy"? -m.gov : m.gov;
+      rows.push(`<div class="wrow"><span class="nm">${govLab}</span><span>—</span><span class="${after<0?'neg':'pos'}">${(after<0?'−':'')+money(Math.abs(after))}</span></div>`);
+    }
+    rows.push(`<div class="wrow"><span class="nm">Total surplus</span><span>${money(m.TSe)}</span><span>${money(m.TS)}</span></div>`);
+    rows.push(`<div class="wrow"><span class="nm">Deadweight loss</span><span>—</span><span class="neg">−${money(m.DWL)}</span></div>`);
+    $("#wtable").innerHTML=rows.join("");
+  }
+  function card(k,v,sub,col){
+    const sw = col? `<span class="sw" style="background:${col}"></span>`:"";
+    return `<div class="stat"><div class="k">${sw}${k}</div><div class="v">${v}</div>${sub?`<div class="sub">${sub}</div>`:""}</div>`;
+  }
+  function wrow(name,before,after){
+    const diff=after-before;
+    return `<div class="wrow"><span class="nm">${name}</span><span>${money(before)}</span>`+
+           `<span class="${diff<0?'neg':(diff>0?'pos':'')}">${money(after)}</span></div>`;
+  }
+
+  // ---------- track fill colors ----------
+  function fillTrack(input,frac,color){
+    const pctv=Math.round(frac*100);
+    input.style.setProperty("--trk",`linear-gradient(90deg, ${color} 0 ${pctv}%, #cdd6de ${pctv}% 100%)`);
+  }
+  function syncTrackFills(){
+    const ar=$("#a"),br=$("#b"),cr=$("#c"),dr=$("#d"),tr=$("#t");
+    fillTrack(ar,(S.a-60)/(100-60),"var(--demand)");
+    fillTrack(br,(S.b-0.5)/(2-0.5),"var(--demand)");
+    fillTrack(cr,(S.c-0)/(45-0),"var(--supply)");
+    fillTrack(dr,(S.d-0.4)/(2-0.4),"var(--supply)");
+    fillTrack(tr,(S.t-0)/(40-0), S.mode==="subsidy"?"var(--cost)":"var(--ink)");
+    $("#aVal").textContent="a = "+S.a;
+    $("#bVal").textContent="b = "+S.b.toFixed(2);
+    $("#cVal").textContent="c = "+S.c;
+    $("#dVal").textContent="d = "+S.d.toFixed(2);
+    $("#tVal").textContent=money(S.t);
+  }
+
+  // ---------- wiring ----------
+  function bindSlider(id,key,parse){
+    const el=$("#"+id);
+    el.value = S[key];
+    el.addEventListener("input",()=>{ S[key]=parse(el.value); syncTrackFills(); render(); });
+  }
+  bindSlider("a","a",v=>+v);
+  bindSlider("b","b",v=>+v);
+  bindSlider("c","c",v=>+v);
+  bindSlider("d","d",v=>+v);
+  bindSlider("t","t",v=>+v);
+
+  // mode buttons
+  document.querySelectorAll(".modeswitch button").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      S.mode=btn.dataset.mode;
+      document.querySelectorAll(".modeswitch button").forEach(b=>b.setAttribute("aria-pressed", b===btn?"true":"false"));
+      // relabel tax controls
+      const isSub=S.mode==="subsidy";
+      $("#taxSectLabel").textContent= isSub? "Per-unit subsidy" : "Per-unit tax";
+      $("#tLabel").textContent= isSub? "Subsidy per unit" : "Tax per unit";
+      $("#govChipLabel").textContent= isSub? "Cost" : "Revenue";
+      $("#taxGroup").style.display = S.mode==="none"? "none":"";
+      syncTrackFills(); render();
+    });
+  });
+
+  // layer chips
+  document.querySelectorAll("#layers .chip").forEach(chip=>{
+    chip.addEventListener("click",()=>{
+      const k=chip.dataset.k;
+      layers[k]=!layers[k];
+      chip.setAttribute("aria-pressed",layers[k]?"true":"false");
+      render();
+    });
+  });
+
+  // presets (with a gentle tween)
+  const reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
+  document.querySelectorAll("#presets button").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const target=presets[btn.dataset.p];
+      if(!target) return;
+      tweenTo(target);
+    });
+  });
+  let raf=null;
+  function tweenTo(target){
+    if(reduce){ Object.assign(S,target); afterTween(); return; }
+    cancelAnimationFrame(raf);
+    const from={a:S.a,b:S.b,c:S.c,d:S.d,t:S.t};
+    const start=performance.now(), dur=420;
+    function step(now){
+      const k=Math.min(1,(now-start)/dur);
+      const e=1-Math.pow(1-k,3);
+      S.a=from.a+(target.a-from.a)*e;
+      S.b=from.b+(target.b-from.b)*e;
+      S.c=from.c+(target.c-from.c)*e;
+      S.d=from.d+(target.d-from.d)*e;
+      S.t=from.t+(target.t-from.t)*e;
+      syncSlidersFromState(); syncTrackFills(); render();
+      if(k<1) raf=requestAnimationFrame(step); else afterTween(target);
+    }
+    raf=requestAnimationFrame(step);
+  }
+  function afterTween(target){
+    if(target) Object.assign(S,target);
+    syncSlidersFromState(); syncTrackFills(); render();
+  }
+  function syncSlidersFromState(){
+    $("#a").value=S.a; $("#b").value=S.b; $("#c").value=S.c; $("#d").value=S.d; $("#t").value=S.t;
+  }
+
+  // init
+  syncTrackFills();
+  render();
+})();
+</script>
+</body>
+</html>
