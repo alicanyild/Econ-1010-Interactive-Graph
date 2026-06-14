@@ -1,4 +1,4 @@
-A dynamic, interactive learning tool designed to help Introduction to Microeconomics students intuitively understand market mechanics. Users can manipulate linear supply and demand equations to simulate real-world economic interventions.
+A dynamic, interactive learning tool designed to help Introduction to Microeconomics students intuitively understand some concepts. Users can manipulate linear supply and demand equations to simulate real-world economic interventions.
 
 Key explorations include:
 (i) Market Equilibrium: Visualize how prices and quantities adjust.
