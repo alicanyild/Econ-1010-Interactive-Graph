@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Microeconomics — Market Equilibrium &amp; Firm Costs (ECON 1010)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<style>
+  :root{
+    --bg:#e9edf1; --surface:#fff; --surface-2:#f5f7f9;
+    --ink:#15212e; --muted:#62717f; --faint:#8b99a6; --line:#d6dde4; --grid:#e7ecf1; --equil:#0e1c29;
+    --demand:#1b6fb3; --demand-fill:rgba(27,111,179,0.16);
+    --supply:#e0871c; --supply-fill:rgba(224,135,28,0.20);
+    --revenue:#1f9d57; --revenue-fill:rgba(31,157,87,0.22);
+    --cost:#7c4ddb; --cost-fill:rgba(124,77,219,0.20);
+    --dwl:#d8392f; --dwl-fill:rgba(216,57,47,0.26);
+    --social:#0d9488; --social-fill:rgba(13,148,136,0.18);
+    --r:13px; --mono:"IBM Plex Mono",ui-monospace,monospace; --disp:"Space Grotesk",sans-serif; --body:"Inter",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:radial-gradient(1100px 560px at 82% -12%,#f3f6f9 0%,rgba(243,246,249,0) 60%),var(--bg);
+    color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased}
+
+  .dash{height:100vh;display:flex;flex-direction:column;padding:14px 18px 12px;max-width:1320px;margin:0 auto;overflow:hidden}
+
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:10px}
+  .brand .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--supply);font-weight:600;margin:0 0 3px;white-space:nowrap}
+  .brand h1{font-family:var(--disp);font-weight:700;font-size:clamp(20px,2.6vw,28px);letter-spacing:-.02em;margin:0;line-height:1}
+  .brand .subhead{margin:6px 0 0;color:var(--muted);font-size:12.5px;max-width:60ch}
+  .applink{font-family:var(--body);font-size:12.5px;font-weight:500;color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:7px 12px;background:var(--surface);transition:.15s;white-space:nowrap}
+  .applink:hover{color:var(--ink);border-color:#bcc6cf}
+
+  .tabbar{display:flex;gap:4px;margin-bottom:12px;border-bottom:1.5px solid var(--line);flex-wrap:wrap}
+  .tabbar button{font-family:var(--disp);font-weight:600;font-size:14px;border:0;background:none;color:var(--muted);
+    padding:9px 2px;margin-right:20px;cursor:pointer;position:relative;letter-spacing:-.01em;transition:color .15s}
+  .tabbar button[aria-selected="true"]{color:var(--ink)}
+  .tabbar button[aria-selected="true"]::after{content:"";position:absolute;left:0;right:0;bottom:-1.5px;height:2.5px;background:var(--ink);border-radius:2px}
+  .tabbar button:focus-visible{outline:2px solid var(--demand);outline-offset:2px;border-radius:4px}
+
+  main.main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:14px;align-items:stretch}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 1px 2px rgba(20,33,46,.04)}
+
+  .graphcard{display:flex;flex-direction:column;min-height:0;padding:12px 12px 6px}
+  .graphhead{display:flex;justify-content:space-between;align-items:center;padding:2px 6px 8px;gap:10px;flex-wrap:wrap}
+  .graphhead .title{font-family:var(--disp);font-weight:600;font-size:14px}
+  .layers{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{font-family:var(--mono);font-size:11px;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);
+    border-radius:999px;padding:5px 10px 5px 8px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.15s;user-select:none}
+  .chip .dot{width:9px;height:9px;border-radius:3px;background:var(--faint);transition:.15s}
+  .chip[aria-pressed="true"]{color:var(--ink);background:#fff;border-color:#c4ccd4}
+  .chip[data-k="cs"][aria-pressed="true"] .dot{background:var(--demand)}
+  .chip[data-k="ps"][aria-pressed="true"] .dot{background:var(--supply)}
+  .chip[data-k="gov"][aria-pressed="true"] .dot{background:var(--revenue)}
+  .chip[data-k="dwl"][aria-pressed="true"] .dot{background:var(--dwl)}
+  .chip:focus-visible{outline:2px solid var(--demand);outline-offset:2px}
+  .svgwrap{flex:1;min-height:0;display:flex}
+  svg#chart{width:100%;height:100%;touch-action:none}
+  svg text{font-family:var(--mono);fill:var(--ink)}
+  .gridline{stroke:var(--grid);stroke-width:1}
+  .axis-line{stroke:var(--ink);stroke-width:1.4}
+  .curve{fill:none;stroke-width:2.6;stroke-linecap:round}
+  .curve.d{stroke:var(--demand)} .curve.s{stroke:var(--supply)}
+  .curve.social{stroke:var(--social);stroke-dasharray:7 5}
+  .curvelabel{font-family:var(--disp);font-weight:700;font-size:13px}
+  .curvelabel.social{fill:var(--social)}
+  .guide{stroke:var(--equil);stroke-width:1;stroke-dasharray:3 4;opacity:.5}
+  .handle{cursor:ns-resize}
+  .badge{fill:#fff;stroke:var(--line)}
+  .reglabel{font-family:var(--disp);font-weight:600}
+  .degenerate{font-family:var(--disp);font-weight:600;fill:var(--muted)}
+
+  .panel{display:flex;flex-direction:column;min-height:0;padding:12px 14px;gap:10px;overflow-y:auto}
+  .sectlabel{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);font-weight:600;margin:0}
+  .grp{display:flex;flex-direction:column;gap:2px}
+  .prow{display:grid;grid-template-columns:104px 1fr 50px;align-items:center;gap:10px;margin-top:4px}
+  .prow label{font-size:12.5px;font-weight:500;color:var(--ink)}
+  .prow .val{font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--muted);text-align:right}
+  .hint{font-size:10.5px;color:var(--faint);margin:2px 0 0}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:18px;background:transparent;cursor:pointer;margin:0}
+  input[type=range]::-webkit-slider-runnable-track{height:5px;border-radius:4px;background:var(--trk,#cdd6de)}
+  input[type=range]::-moz-range-track{height:5px;border-radius:4px;background:#cdd6de}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;border:2.5px solid var(--thumb,var(--ink));margin-top:-5.5px;box-shadow:0 1px 3px rgba(20,33,46,.18);transition:transform .12s}
+  input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#fff;border:2.5px solid var(--thumb,var(--ink));box-shadow:0 1px 3px rgba(20,33,46,.18)}
+  input[type=range]:active::-webkit-slider-thumb{transform:scale(1.14)}
+  input[type=range]:focus-visible::-webkit-slider-thumb{outline:2px solid var(--demand);outline-offset:2px}
+  .grp.d-th input[type=range]{--thumb:var(--demand)}
+  .grp.s-th input[type=range]{--thumb:var(--supply)}
+  .grp.t-th input[type=range]{--thumb:var(--ink)}
+  .grp.e-th input[type=range]{--thumb:var(--social)}
+
+  .segctl{display:flex;gap:4px;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:3px;margin-top:5px}
+  .segctl button{flex:1;font-family:var(--body);font-size:12px;font-weight:500;border:0;background:none;color:var(--muted);padding:6px 6px;border-radius:6px;cursor:pointer;transition:.15s}
+  .segctl button[aria-pressed="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(20,33,46,.1)}
+  .segctl button:focus-visible{outline:2px solid var(--social);outline-offset:1px}
+
+  .presets{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+  .presets button{font-family:var(--body);font-size:11.5px;font-weight:500;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:8px;padding:6px 9px;cursor:pointer;transition:.15s}
+  .presets button:hover{background:#fff;border-color:#bcc6cf}
+  .presets button:focus-visible{outline:2px solid var(--demand);outline-offset:2px}
+
+  .insight{background:linear-gradient(180deg,#fbfcfd,#f4f7f9);border:1px solid var(--line);border-radius:11px;padding:10px 12px;font-size:12.5px;line-height:1.5;color:var(--ink)}
+  .insight .lead{font-family:var(--disp);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);display:block;margin-bottom:3px}
+  .insight b{font-weight:600}
+
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+  .stat .k{font-size:10.5px;color:var(--muted);font-weight:500;display:flex;align-items:center;gap:5px}
+  .stat .k .sw{width:8px;height:8px;border-radius:2px;flex:none}
+  .stat .v{font-family:var(--mono);font-weight:600;font-size:16px;letter-spacing:-.01em;margin-top:2px}
+  .stat .sub{font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:1px}
+  .stat.wide{grid-column:1 / -1}
+
+  .burden .track{height:22px;border-radius:7px;overflow:hidden;display:flex;border:1px solid var(--line);margin-top:6px}
+  .burden .seg{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:600;color:#fff;transition:width .2s ease}
+  .burden .seg.c{background:var(--demand)} .burden .seg.p{background:var(--supply)}
+  .burden .lab{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);margin-top:4px}
+  .elasnote{font-size:11px;color:var(--muted);margin-top:7px;line-height:1.45}
+  .elasnote b{color:var(--ink);font-weight:600}
+
+  details.welfare{border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden}
+  details.welfare summary{cursor:pointer;list-style:none;padding:9px 12px;font-size:12px;font-weight:600;color:var(--ink);display:flex;justify-content:space-between;align-items:center}
+  details.welfare summary::-webkit-details-marker{display:none}
+  details.welfare summary .caret{transition:.2s;color:var(--faint)}
+  details.welfare[open] summary .caret{transform:rotate(90deg)}
+  .wtable{padding:0 12px 11px;font-family:var(--mono);font-size:11.5px}
+  .wrow{display:grid;grid-template-columns:1fr auto auto;gap:8px;padding:5px 0;border-top:1px solid var(--grid);align-items:baseline}
+  .wrow:first-child{border-top:0;color:var(--faint);font-size:10px;letter-spacing:.05em}
+  .wrow .neg{color:var(--dwl)} .wrow .pos{color:var(--revenue)} .wrow .nm{font-family:var(--body);font-weight:500}
+
+  @media (max-width:900px){
+    .dash{height:auto;overflow:visible}
+    main.main{grid-template-columns:1fr}
+    .svgwrap{height:62vw;max-height:460px}
+    .panel{overflow:visible}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ---- firm styles ---- */
+
+  :root{
+    --bg:#e9edf1; --surface:#fff; --surface-2:#f5f7f9;
+    --ink:#15212e; --muted:#62717f; --faint:#8b99a6; --line:#d6dde4; --grid:#e7ecf1; --equil:#0e1c29;
+    --mc:#6d3bd1; --atc:#1b6fb3; --avc:#e0871c; --price:#0e8a52;
+    --profit-fill:rgba(31,157,87,0.22); --loss-fill:rgba(216,57,47,0.22);
+    --revenue:#1f9d57; --dwl:#d8392f;
+    --r:13px; --mono:"IBM Plex Mono",ui-monospace,monospace; --disp:"Space Grotesk",sans-serif; --body:"Inter",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:radial-gradient(1100px 560px at 82% -12%,#f3f6f9 0%,rgba(243,246,249,0) 60%),var(--bg);
+    color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased}
+
+  /* dashboard fills exactly one viewport; explanations sit below the fold */
+  .dash{min-height:100vh;display:flex;flex-direction:column;padding:16px 18px 10px;max-width:1320px;margin:0 auto}
+
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+  .brand .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+    color:var(--avc);font-weight:600;margin:0 0 3px;white-space:nowrap}
+  .brand h1{font-family:var(--disp);font-weight:700;font-size:clamp(20px,2.6vw,28px);letter-spacing:-.02em;margin:0;line-height:1}
+  .headright{display:flex;align-items:center;gap:14px}
+  .runswitch{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px;gap:2px;box-shadow:0 1px 2px rgba(20,33,46,.04)}
+  .runswitch button{font-family:var(--disp);font-weight:600;font-size:13px;border:0;background:none;color:var(--muted);
+    padding:7px 16px;border-radius:999px;cursor:pointer;transition:.18s}
+  .runswitch button[aria-pressed="true"]{background:var(--ink);color:#fff}
+  .runswitch button:focus-visible{outline:2px solid var(--atc);outline-offset:2px}
+  .applink{font-family:var(--body);font-size:12.5px;font-weight:500;color:var(--muted);text-decoration:none;
+    border:1px solid var(--line);border-radius:8px;padding:7px 12px;background:var(--surface);transition:.15s;white-space:nowrap}
+  .applink:hover{color:var(--ink);border-color:#bcc6cf}
+
+  main.main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 372px;gap:14px;align-items:stretch}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 1px 2px rgba(20,33,46,.04)}
+
+  .graphcard{display:flex;flex-direction:column;min-height:0;padding:12px 12px 6px}
+  .graphhead{display:flex;justify-content:space-between;align-items:center;padding:2px 6px 8px;gap:10px;flex-wrap:wrap}
+  .graphhead .title{font-family:var(--disp);font-weight:600;font-size:14px}
+  .layers{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{font-family:var(--mono);font-size:11px;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);
+    border-radius:999px;padding:5px 10px 5px 8px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.15s;user-select:none}
+  .chip .dot{width:9px;height:9px;border-radius:3px;background:var(--faint);transition:.15s}
+  .chip[aria-pressed="true"]{color:var(--ink);background:#fff;border-color:#c4ccd4}
+  .chip[data-k="mc"][aria-pressed="true"] .dot{background:var(--mc)}
+  .chip[data-k="atc"][aria-pressed="true"] .dot{background:var(--atc)}
+  .chip[data-k="avc"][aria-pressed="true"] .dot{background:var(--avc)}
+  .chip:focus-visible{outline:2px solid var(--atc);outline-offset:2px}
+  .svgwrap{flex:1;min-height:0;display:flex}
+  svg#fchart{width:100%;height:100%}
+  svg text{font-family:var(--mono);fill:var(--ink)}
+  .gridline{stroke:var(--grid);stroke-width:1}
+  .axis-line{stroke:var(--ink);stroke-width:1.4}
+  .curve{fill:none;stroke-linecap:round;stroke-width:2.6}
+  .curve.mc{stroke:var(--mc)} .curve.atc{stroke:var(--atc)} .curve.avc{stroke:var(--avc)}
+  .curve.supply-hi{stroke:var(--mc);stroke-width:5}
+  .priceline{stroke:var(--price);stroke-width:2;stroke-dasharray:6 4}
+  .guide{stroke:var(--equil);stroke-width:1;stroke-dasharray:3 4;opacity:.5}
+  .curvelabel{font-family:var(--disp);font-weight:700;font-size:13px}
+  .badge{fill:#fff;stroke:var(--line)}
+  .reglabel{font-family:var(--disp);font-weight:600}
+
+  /* panel */
+  .panel{display:flex;flex-direction:column;min-height:0;padding:13px 14px;gap:11px;overflow-y:auto}
+  .ptaker{display:flex;align-items:flex-start;gap:8px;background:linear-gradient(180deg,#fbfcfd,#f3f6f9);
+    border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:12px;line-height:1.45;color:var(--ink)}
+  .ptaker .tag{flex:none;font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+    color:#fff;background:var(--price);border-radius:5px;padding:3px 6px;margin-top:1px}
+  .ptaker b{font-weight:600}
+
+  .sectlabel{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);font-weight:600;margin:2px 0 0}
+  .prow{display:grid;grid-template-columns:96px 1fr 54px;align-items:center;gap:10px;margin-top:6px}
+  .prow label{font-size:12.5px;font-weight:500;color:var(--ink)}
+  .prow .val{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--muted);text-align:right}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:18px;background:transparent;cursor:pointer;margin:0}
+  input[type=range]::-webkit-slider-runnable-track{height:5px;border-radius:4px;background:var(--trk,#cdd6de)}
+  input[type=range]::-moz-range-track{height:5px;border-radius:4px;background:#cdd6de}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;
+    background:#fff;border:2.5px solid var(--thumb,var(--price));margin-top:-5.5px;box-shadow:0 1px 3px rgba(20,33,46,.18);transition:transform .12s}
+  input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#fff;border:2.5px solid var(--thumb,var(--price));box-shadow:0 1px 3px rgba(20,33,46,.18)}
+  input[type=range]:active::-webkit-slider-thumb{transform:scale(1.14)}
+  input[type=range]:focus-visible::-webkit-slider-thumb{outline:2px solid var(--atc);outline-offset:2px}
+  .price-th input[type=range]{--thumb:var(--price)}
+  .fc-th input[type=range]{--thumb:var(--ink)}
+  .hint{font-size:11px;color:var(--faint);margin:3px 0 0;grid-column:1 / -1}
+
+  .lrnote{font-size:11.5px;line-height:1.5;color:var(--muted);background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+  .lrnote b{color:var(--ink);font-weight:600}
+
+  .presets{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
+  .presets button{font-family:var(--body);font-size:11.5px;font-weight:500;border:1px solid var(--line);background:var(--surface-2);
+    color:var(--ink);border-radius:8px;padding:6px 9px;cursor:pointer;transition:.15s}
+  .presets button:hover{background:#fff;border-color:#bcc6cf}
+  .presets button:focus-visible{outline:2px solid var(--atc);outline-offset:2px}
+
+  .insight{background:linear-gradient(180deg,#fbfcfd,#f4f7f9);border:1px solid var(--line);border-radius:11px;padding:10px 12px;font-size:12.5px;line-height:1.5}
+  .insight .lead{font-family:var(--disp);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);display:block;margin-bottom:3px}
+  .regime{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:999px;margin-bottom:5px}
+  .regime.profit{background:rgba(31,157,87,.14);color:#15803d}
+  .regime.loss{background:rgba(216,57,47,.13);color:#b91c1c}
+  .regime.shut{background:rgba(98,113,127,.14);color:var(--muted)}
+  .insight b{font-weight:600}
+
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+  .stat .k{font-size:10.5px;color:var(--muted);font-weight:500;display:flex;align-items:center;gap:5px}
+  .stat .k .sw{width:8px;height:8px;border-radius:2px;flex:none}
+  .stat .v{font-family:var(--mono);font-weight:600;font-size:16px;letter-spacing:-.01em;margin-top:2px}
+  .stat .sub{font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:1px}
+
+  /* explanations below the fold */
+  .explaincard{margin:16px auto 30px;max-width:1320px;padding:22px 24px}
+  .explaincard h2{font-family:var(--disp);font-weight:700;font-size:18px;margin:0 0 4px;letter-spacing:-.01em}
+  .explaincard .sub{color:var(--muted);font-size:13px;margin:0 0 18px}
+  .exgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px 22px}
+  .exitem{border-left:2px solid var(--line);padding-left:13px}
+  .exitem h3{font-family:var(--disp);font-weight:600;font-size:13.5px;margin:0 0 4px;display:flex;align-items:center;gap:7px}
+  .exitem h3 .sw{width:11px;height:3px;border-radius:2px;display:inline-block}
+  .exitem p{margin:0;font-size:12.8px;color:var(--ink);line-height:1.5}
+  .exitem p+p{margin-top:8px}
+  .exitem .term{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .exitem.span2{grid-column:1 / -1;border-left:0;padding-left:0}
+  .scrollcue{text-align:center;color:var(--faint);font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;padding:6px 0 2px}
+
+  @media (max-width:900px){
+    .dash{min-height:0}
+    main.main{grid-template-columns:1fr}
+    .svgwrap{height:54vw;max-height:440px}
+    .panel{overflow:visible}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+  /* ===== combined-layout overrides (must stay last) ===== */
+  html,body{margin:0}
+  .dash{min-height:100vh;display:flex;flex-direction:column;padding:14px 18px 12px;max-width:1320px;margin:0 auto;overflow:visible}
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:8px}
+  .headctrl{display:flex;align-items:center;gap:14px}
+  .tabbar{margin-bottom:12px}
+  main.main{flex:1;min-height:0;display:flex}
+  .dashgrid{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:14px;align-items:stretch}
+  .explaincard{margin:16px auto 30px;max-width:1320px}
+  .scrollcue{display:none}
+  .credit{max-width:1320px;margin:0 auto;padding:2px 26px 28px;color:var(--faint);
+    font-family:var(--mono);font-size:11px;letter-spacing:.04em}
+  @media (max-width:980px){
+    .dash{min-height:0}
+    main.main{display:block}
+    .dashgrid{grid-template-columns:1fr}
+    .svgwrap{height:60vw;max-height:460px}
+    .panel{overflow:visible}
+  }
+</style>
+</head>
+<body>
+<div class="dash">
+  <header class="top">
+    <div class="brand">
+      <p class="eyebrow">ECON 1010 · Introduction to Microeconomics</p>
+      <h1 id="appTitle">Market Equilibrium &amp; Welfare</h1>
+      <p class="subhead" id="appSub">Drag the curves and the tax wedge to see incidence, revenue, and deadweight loss respond.</p>
+    </div>
+    <div class="headctrl">
+      <div class="runswitch" id="firmRun" role="group" aria-label="Time horizon" style="display:none">
+        <button data-v="SR" aria-pressed="true">Short run</button>
+        <button data-v="LR">Long run</button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabbar" role="tablist" aria-label="Topic">
+    <button role="tab" data-tab="none" aria-selected="true">No intervention</button>
+    <button role="tab" data-tab="tax" aria-selected="false">Equilibrium with taxes</button>
+    <button role="tab" data-tab="subsidy" aria-selected="false">Equilibrium with subsidies</button>
+    <button role="tab" data-tab="externality" aria-selected="false">Equilibrium with externalities</button>
+    <button role="tab" data-tab="firm" aria-selected="false">Costs &amp; profit maximization</button>
+  </nav>
+
+  <main class="main">
+    <section id="marketSection" class="dashgrid">
+    <section class="card graphcard">
+      <div class="graphhead">
+        <span class="title">Market for a good</span>
+        <div class="layers" id="layers">
+          <button class="chip" data-k="cs" aria-pressed="true"><span class="dot"></span>Consumer surplus</button>
+          <button class="chip" data-k="ps" aria-pressed="true"><span class="dot"></span>Producer surplus</button>
+          <button class="chip" id="govChip" data-k="gov" aria-pressed="true"><span class="dot"></span><span id="govChipLabel">Tax revenue</span></button>
+          <button class="chip" id="dwlChip" data-k="dwl" aria-pressed="true"><span class="dot"></span>Deadweight loss</button>
+        </div>
+      </div>
+      <div class="svgwrap">
+        <svg id="chart" viewBox="0 0 640 500" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Supply and demand diagram"></svg>
+      </div>
+    </section>
+
+    <aside class="card panel">
+      <div class="grp d-th">
+        <p class="sectlabel">Demand</p>
+        <div class="prow"><label for="a">Shift</label><input type="range" id="a" min="60" max="100" step="1"><span class="val" id="aVal"></span></div>
+        <div class="prow"><label for="b">Slope (elasticity)</label><input type="range" id="b" min="0.35" max="4" step="0.05"><span class="val" id="bVal"></span></div>
+      </div>
+      <div class="grp s-th">
+        <p class="sectlabel">Supply</p>
+        <div class="prow"><label for="c">Shift</label><input type="range" id="c" min="0" max="45" step="1"><span class="val" id="cVal"></span></div>
+        <div class="prow"><label for="d">Slope (elasticity)</label><input type="range" id="d" min="0.3" max="4" step="0.05"><span class="val" id="dVal"></span></div>
+      </div>
+
+      <div class="grp t-th" id="taxGroup" style="display:none">
+        <p class="sectlabel" id="taxSectLabel">Per-unit tax</p>
+        <div class="prow"><label for="t" id="tLabel">Tax</label><input type="range" id="t" min="0" max="40" step="0.5"><span class="val" id="tVal"></span></div>
+        <p class="hint" id="tHint">Or grab the wedge on the graph and drag it.</p>
+      </div>
+
+      <div class="grp e-th" id="extGroup" style="display:none">
+        <p class="sectlabel">Externality</p>
+        <div class="segctl" id="extSign" role="group" aria-label="Externality sign">
+          <button data-v="neg" aria-pressed="true">Negative</button>
+          <button data-v="pos">Positive</button>
+        </div>
+        <div class="segctl" id="extSide" role="group" aria-label="Externality source">
+          <button data-v="production" aria-pressed="true">Production</button>
+          <button data-v="consumption">Consumption</button>
+        </div>
+        <div class="prow"><label for="e">External effect</label><input type="range" id="e" min="0" max="35" step="0.5"><span class="val" id="eVal"></span></div>
+        <p class="hint" id="eHint"></p>
+      </div>
+
+      <div class="grp">
+        <p class="sectlabel">Scenarios</p>
+        <div class="presets" id="presets">
+          <button data-p="default">Reset</button>
+          <button data-p="inelasticD">Inelastic demand</button>
+          <button data-p="elasticD">Elastic demand</button>
+          <button data-p="inelasticS">Inelastic supply</button>
+        </div>
+      </div>
+
+      <div class="insight" id="insight"></div>
+      <div class="stats" id="stats"></div>
+
+      <div class="stat wide burden" id="burdenCard" style="display:none">
+        <div class="k" id="burdenTitle">Tax burden split</div>
+        <div class="track">
+          <div class="seg c" id="segC">—</div>
+          <div class="seg p" id="segP">—</div>
+        </div>
+        <div class="lab"><span>Consumers</span><span>Producers</span></div>
+        <div class="elasnote" id="elasNote"></div>
+      </div>
+
+      <details class="welfare">
+        <summary><span>Welfare breakdown</span><span class="caret">▸</span></summary>
+        <div class="wtable" id="wtable"></div>
+      </details>
+    </aside>
+  </section>
+    <section id="firmSection" class="dashgrid" style="display:none">
+    <section class="card graphcard">
+      <div class="graphhead">
+        <span class="title">A competitive firm's cost curves</span>
+        <div class="layers" id="flayers">
+          <button class="chip" data-k="mc" aria-pressed="true"><span class="dot"></span>MC</button>
+          <button class="chip" data-k="atc" aria-pressed="true"><span class="dot"></span>ATC</button>
+          <button class="chip" data-k="avc" aria-pressed="true"><span class="dot"></span>AVC</button>
+        </div>
+      </div>
+      <div class="svgwrap">
+        <svg id="fchart" viewBox="0 0 640 500" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Firm cost curves diagram"></svg>
+      </div>
+    </section>
+
+    <aside class="card panel">
+      <div class="ptaker" id="ptaker"></div>
+
+      <div class="price-th" id="fpCtrl">
+        <p class="sectlabel">Market price the firm faces</p>
+        <div class="prow">
+          <label for="fp">Price</label>
+          <input type="range" id="fp" min="10" max="100" step="1">
+          <span class="val" id="fpVal"></span>
+        </div>
+      </div>
+      <div class="lrnote" id="lrNote" style="display:none"></div>
+
+      <div class="fc-th">
+        <p class="sectlabel">Fixed cost</p>
+        <div class="prow">
+          <label for="ffc">Fixed cost</label>
+          <input type="range" id="ffc" min="0" max="120" step="2">
+          <span class="val" id="ffcVal"></span>
+        </div>
+      </div>
+
+      <div>
+        <p class="sectlabel">Try a price (short run)</p>
+        <div class="presets" id="fpresets">
+          <button data-fp="profit">Profit</button>
+          <button data-fp="loss">Loss, still open</button>
+          <button data-fp="shutdown">Below shutdown</button>
+          <button data-fp="breakeven">Break-even</button>
+        </div>
+      </div>
+
+      <div class="insight" id="finsight"></div>
+      <div class="stats" id="fstats"></div>
+    </aside>
+  </section>
+  </main>
+</div>
+
+<section class="card explaincard" id="mexplaincard">
+  <h2>The model behind the diagram</h2>
+  <p class="sub">Everything here is built on straight-line (linear) demand and supply, so every result has a clean closed form you can check by hand.</p>
+  <div class="exgrid">
+    <div class="exitem"><h3>Demand &amp; supply</h3>
+      <p>Inverse demand is \(P = a - bQ\) and inverse supply is \(P = c + dQ\). The intercepts \(a\) and \(c\) set each curve's position; the slopes \(b\) and \(d\) set steepness — a bigger slope means a steeper, more inelastic curve. The wide slider ranges let you push toward nearly flat (very elastic) or nearly vertical (very inelastic).</p></div>
+    <div class="exitem"><h3>Equilibrium &amp; surplus</h3>
+      <p>Setting demand equal to supply gives \(Q^{*} = \dfrac{a-c}{b+d}\) and \(P^{*} = a - bQ^{*}\). The triangle between demand and \(P^{*}\) is consumer surplus; the triangle between \(P^{*}\) and supply is producer surplus.</p></div>
+    <div class="exitem"><h3>Elasticity</h3>
+      <p>Measured at the equilibrium point: \(\lvert\varepsilon_D\rvert = \dfrac{1}{b}\cdot\dfrac{P^{*}}{Q^{*}}\) and \(\varepsilon_S = \dfrac{1}{d}\cdot\dfrac{P^{*}}{Q^{*}}\). These determine who bears a tax or captures a subsidy.</p></div>
+    <div class="exitem"><h3>Taxes</h3>
+      <p>A per-unit tax \(t\) opens a wedge: consumers pay \(P_c\), producers keep \(P_c - t\). The consumer's share of the burden is \(\dfrac{b}{b+d} = \dfrac{\varepsilon_S}{\varepsilon_S + \lvert\varepsilon_D\rvert}\) — the more inelastic side pays more. Revenue is \(t\cdot Q\) and deadweight loss is \(\dfrac{1}{2}\cdot\dfrac{t^{2}}{b+d}\).</p></div>
+    <div class="exitem"><h3>Subsidies</h3>
+      <p>A per-unit subsidy \(s\) is the mirror image, pushing output above the efficient level. Government spending of \(s\cdot Q\) is a transfer to the market, while the over-production still wastes \(\dfrac{1}{2}\cdot\dfrac{s^{2}}{b+d}\) as deadweight loss.</p></div>
+    <div class="exitem"><h3>Externalities</h3>
+      <p>An external effect of \(e\) per unit shifts the relevant private curve to a social one — MSC for a production effect, MSB for a consumption effect. The efficient quantity is where \(\text{MSB} = \text{MSC}\); the gap from the market quantity creates \(\dfrac{1}{2}\cdot\dfrac{e^{2}}{b+d}\) of deadweight loss, which a Pigouvian tax or subsidy of \(e\) would remove.</p></div>
+  </div>
+</section>
+
+<section class="card explaincard" id="fexplaincard" style="display:none"></section>
+
+<footer class="credit">Alican Yıldırım, 2026</footer>
+
+<script>
+
+(()=>{
+  "use strict";
+
+  // ---------- state ----------
+  const S = { a:100, b:0.8, c:20, d:0.6, t:15, mode:"none",
+              e:15, extSign:"neg", extSide:"production" };
+  const layers = { cs:true, ps:true, gov:true, dwl:true };
+  const presets = {
+    default:   {a:100,b:0.8,c:20,d:0.6,t:15},
+    inelasticD:{a:100,b:1.9,c:20,d:0.6,t:15},
+    elasticD:  {a:100,b:0.55,c:20,d:0.6,t:15},
+    inelasticS:{a:100,b:0.8,c:10,d:1.9,t:15}
+  };
+
+  // ---------- geometry ----------
+  const QMAX=160, PMAX=110;
+  const VB={w:640,h:500}, M={l:54,r:22,t:20,b:46};
+  const PW=VB.w-M.l-M.r, PH=VB.h-M.t-M.b;
+  const X = q => M.l + (Math.max(0,Math.min(QMAX,q))/QMAX)*PW;
+  const Y = p => M.t + (1-Math.max(0,Math.min(PMAX,p))/PMAX)*PH;
+  const Xr = q => M.l + (q/QMAX)*PW;
+  const Yr = p => M.t + (1-p/PMAX)*PH;
+
+  // ---------- formatting ----------
+  const $ = s=>document.querySelector(s);
+  const money = v => "$"+(Math.abs(v)<10? v.toFixed(1): Math.round(v).toLocaleString());
+  const num   = v => (Math.abs(v)<10? v.toFixed(1): Math.round(v).toLocaleString());
+  const pct   = v => isFinite(v)? Math.round(v*100)+"%" : "—";
+  const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+  const chart = $("#chart");
+  function poly(pts,fill){
+    const d = pts.map(p=>`${Xr(p[0]).toFixed(1)},${Yr(p[1]).toFixed(1)}`).join(" ");
+    return `<polygon points="${d}" fill="${fill}"/>`;
+  }
+  function centroid(pts){
+    const x=pts.reduce((s,p)=>s+p[0],0)/pts.length;
+    const y=pts.reduce((s,p)=>s+p[1],0)/pts.length;
+    return [x,y];
+  }
+  function regLabel(pts,text,color){
+    const creg=centroid(pts);
+    const cx=Xr(creg[0]), cy=Yr(creg[1]);
+    const wbox=text.length*5.2+10;
+    return `<g><rect class="badge" x="${(cx-wbox/2).toFixed(1)}" y="${(cy-9).toFixed(1)}" width="${wbox.toFixed(1)}" height="17" rx="5"/>`+
+           `<text class="reglabel" x="${cx.toFixed(1)}" y="${(cy+3.5).toFixed(1)}" text-anchor="middle" font-size="10.5" fill="${color}">${text}</text></g>`;
+  }
+  // arrow callout: badge parked straight above ("up") or below ("down") the point,
+  // with an arrow pointing back to it. Vertical placement keeps the two labels apart.
+  function arrowLabel(q,p,text,color,place){
+    const x=Xr(q), y=Yr(p);
+    const w=text.length*5.6+16, h=17, oy=30;
+    let lx=x, ly = place==="up" ? y-oy : y+oy;
+    lx = Math.max(M.l+w/2+3, Math.min(M.l+PW-w/2-3, lx));
+    ly = Math.max(M.t+h/2+3, Math.min(M.t+PH-h/2-3, ly));
+    const ang = Math.atan2(y-ly, x-lx);
+    const sx = lx + Math.cos(ang)*(w*0.18) , sy = ly + (place==="up"? h/2+1 : -(h/2+1));
+    const ah = 6;
+    const bx = x - Math.cos(ang)*ah, by = y - Math.sin(ang)*ah;
+    const a1x = x - Math.cos(ang-0.45)*ah, a1y = y - Math.sin(ang-0.45)*ah;
+    const a2x = x - Math.cos(ang+0.45)*ah, a2y = y - Math.sin(ang+0.45)*ah;
+    return `<g>`+
+      `<line x1="${sx.toFixed(1)}" y1="${sy.toFixed(1)}" x2="${bx.toFixed(1)}" y2="${by.toFixed(1)}" stroke="${color}" stroke-width="1.5"/>`+
+      `<polygon points="${x.toFixed(1)},${y.toFixed(1)} ${a1x.toFixed(1)},${a1y.toFixed(1)} ${a2x.toFixed(1)},${a2y.toFixed(1)}" fill="${color}"/>`+
+      `<rect class="badge" x="${(lx-w/2).toFixed(1)}" y="${(ly-h/2).toFixed(1)}" width="${w.toFixed(1)}" height="${h}" rx="5"/>`+
+      `<text x="${lx.toFixed(1)}" y="${(ly+3.6).toFixed(1)}" text-anchor="middle" font-size="9.5" font-weight="600" fill="${color}" font-family="var(--disp)">${text}</text>`+
+      `</g>`;
+  }
+
+  function model(){
+    if(S.mode==="externality") return modelExt();
+    const {a,b,c,d,mode}=S;
+    const g = mode==="none" ? 0 : S.t;
+    const sign = mode==="subsidy" ? 1 : -1;     // subsidy raises traded Q, tax lowers it
+    const Qe = (a-c)/(b+d);                       // free-market equilibrium
+    const Pe = a - b*Qe;
+    // wedge: consumer price - producer price = -g for tax (+g for subsidy means producer gets more)
+    // tax:    Pc - Pp = +g  ;  subsidy: Pc - Pp = -g
+    const wedge = (mode==="subsidy") ? -g : g;
+    let Q = (a - c - wedge)/(b+d);
+    Q = Math.max(0, Q);
+    const Pc = a - b*Q;          // price consumers pay
+    const Pp = c + d*Q;          // price producers receive  (Pc - Pp = wedge)
+    const gov = g*Q;             // tax revenue (tax) or subsidy outlay (subsidy)
+    // surplus
+    const CS = 0.5*b*Q*Q;
+    const PS = 0.5*d*Q*Q;
+    const CSe= 0.5*b*Qe*Qe;
+    const PSe= 0.5*d*Qe*Qe;
+    const TSe= CSe+PSe;
+    const govSigned = (mode==="subsidy") ? -gov : gov;
+    const TS = CS+PS+govSigned;
+    const DWL= Math.max(0, TSe - TS);
+    // incidence (per unit)
+    const consUnit = Pc - Pe;        // tax: >0 ; subsidy: <0 (consumers gain)
+    const prodUnit = Pe - Pp;        // tax: >0 ; subsidy: <0 (producers gain)
+    const consShare = g>1e-9 ? Math.abs(consUnit)/g : NaN;
+    const prodShare = g>1e-9 ? Math.abs(prodUnit)/g : NaN;
+    // point elasticities at free-market equilibrium
+    const eD = (Qe>1e-9) ? (1/b)*(Pe/Qe) : Infinity;   // |elasticity| of demand
+    const eS = (Qe>1e-9) ? (1/d)*(Pe/Qe) : Infinity;
+    return {a,b,c,d,g,mode,Qe,Pe,Q,Pc,Pp,gov,govSigned,CS,PS,CSe,PSe,TSe,TS,DWL,
+            consUnit,prodUnit,consShare,prodShare,eD,eS,
+            valid:(a>c && Qe>0)};
+  }
+
+function modelExt(){
+    const {a,b,c,d,e,extSign,extSide}=S;
+    const k=b+d;
+    const Qm=(a-c)/k, Pm=a-b*Qm;          // private market equilibrium (MPB = MPC)
+    // social benefit intercept A, social cost intercept C
+    let A=a, C=c;
+    if(extSide==="production"){ C = c + (extSign==="neg"? e : -e); }   // MSC = C + dQ
+    else                      { A = a + (extSign==="neg"? -e : e); }   // MSB = A - bQ
+    const Qeff=(A-C)/k;                    // efficient quantity: MSB = MSC
+    const SBstar=A-b*Qeff;                 // social price at efficient allocation
+    const CS=0.5*b*Qm*Qm, PS=0.5*d*Qm*Qm;  // private surpluses at the market outcome
+    const externalTotal=e*Qm;              // total external cost/benefit over traded units
+    const DWL=0.5*e*e/k;
+    const SSeff=0.5*k*Qeff*Qeff;           // max attainable social surplus
+    const SSm=(A-C)*Qm-0.5*k*Qm*Qm;        // social surplus at the market outcome
+    const isNeg = extSign==="neg";
+    // marginal-curve evaluators for drawing
+    const SB = q => A - b*q;               // marginal social benefit
+    const SC = q => C + d*q;               // marginal social cost
+    const eD=(Qm>1e-9)?(1/b)*(Pm/Qm):Infinity;
+    const eS=(Qm>1e-9)?(1/d)*(Pm/Qm):Infinity;
+    return {a,b,c,d,mode:"externality",e,extSign,extSide,isNeg,k,
+            Qm,Pm,A,C,Qeff,SBstar,CS,PS,externalTotal,DWL,SSeff,SSm,SB,SC,eD,eS,
+            valid:(a>c && Qm>0 && Qeff>0)};
+  }
+
+function render(){
+    const m = model();
+    let svg = `<defs><clipPath id="plot"><rect x="${M.l}" y="${M.t}" width="${PW}" height="${PH}"/></clipPath></defs>`;
+
+    if(!m.valid){
+      svg += `<rect x="${M.l}" y="${M.t}" width="${PW}" height="${PH}" fill="#fafbfc" stroke="${'#e7ecf1'}"/>`;
+      svg += `<text class="degenerate" x="${VB.w/2}" y="${VB.h/2}" text-anchor="middle" font-size="13">Demand intercept must exceed supply intercept for a market to exist.</text>`;
+      chart.innerHTML=svg; updatePanel(m); return;
+    }
+
+    if(m.mode==="externality"){ renderExt(m); return; }
+
+    // gridlines
+    let grid="";
+    for(let q=0;q<=QMAX;q+=20){ grid+=`<line class="gridline" x1="${Xr(q)}" y1="${M.t}" x2="${Xr(q)}" y2="${M.t+PH}"/>`; }
+    for(let p=0;p<=PMAX;p+=20){ grid+=`<line class="gridline" x1="${M.l}" y1="${Yr(p)}" x2="${M.l+PW}" y2="${Yr(p)}"/>`; }
+    svg+=grid;
+
+    // ---- shaded regions (clipped) ----
+    let reg="";
+    const Qtraded = m.Q, Pc=m.Pc, Pp=m.Pp;
+    const showWedge = m.mode!=="none" && m.g>1e-9;
+
+    if(layers.cs){
+      reg += poly([[0,Pc],[0,m.a],[Qtraded,Pc]], "var(--demand-fill)");
+    }
+    if(layers.ps){
+      reg += poly([[0,m.c],[0,Pp],[Qtraded,Pp]], "var(--supply-fill)");
+    }
+    if(layers.gov && showWedge){
+      // rectangle between Pp and Pc, width 0..Qtraded — green for both tax revenue and govt spending
+      reg += poly([[0,Pp],[0,Pc],[Qtraded,Pc],[Qtraded,Pp]], "var(--revenue-fill)");
+    }
+    if(layers.dwl && showWedge && (m.mode==="tax"||m.mode==="subsidy")){
+      // deadweight loss: lost gains from trade (tax) or value of over-production (subsidy)
+      reg += poly([[Qtraded,Pc],[Qtraded,Pp],[m.Qe,m.Pe]], "var(--dwl-fill)");
+    }
+    svg += `<g clip-path="url(#plot)">${reg}</g>`;
+
+    // ---- region labels ----
+    let labs="";
+    if(showWedge){
+      if(layers.gov){
+        const lbl = m.mode==="subsidy" ? "Govt spending" : "Tax revenue";
+        const col = "var(--revenue)";
+        labs += regLabel([[0,Pp],[0,Pc],[Qtraded,Pc],[Qtraded,Pp]], lbl, col);
+      }
+      if(layers.dwl && (m.mode==="tax"||m.mode==="subsidy") && Math.abs(m.Qe-Qtraded)>3){
+        labs += regLabel([[Qtraded,Pc],[Qtraded,Pp],[m.Qe,m.Pe]], "DWL", "var(--dwl)");
+      }
+    }
+
+    // ---- curves (clipped) ----
+    let curves=`<g clip-path="url(#plot)">`;
+    // demand from Q=0 to Q where P=0  (a/b)
+    curves += `<line class="curve d" x1="${Xr(0)}" y1="${Yr(m.a)}" x2="${Xr(m.a/m.b)}" y2="${Yr(0)}"/>`;
+    // supply from Q=0 (P=c) extending up
+    const supTopQ = Math.min(QMAX, (PMAX-m.c)/m.d);
+    curves += `<line class="curve s" x1="${Xr(0)}" y1="${Yr(m.c)}" x2="${Xr(supTopQ)}" y2="${Yr(m.c+m.d*supTopQ)}"/>`;
+    curves += `</g>`;
+    svg += curves;
+
+    // ---- guide lines + equilibrium ----
+    let guides="";
+    // efficient equilibrium point
+    guides += `<g clip-path="url(#plot)">`;
+    guides += `<line class="guide" x1="${Xr(m.Qe)}" y1="${Yr(m.Pe)}" x2="${Xr(m.Qe)}" y2="${Yr(0)}"/>`;
+    guides += `<line class="guide" x1="${M.l}" y1="${Yr(m.Pe)}" x2="${Xr(m.Qe)}" y2="${Yr(m.Pe)}"/>`;
+    if(showWedge){
+      guides += `<line class="guide" x1="${Xr(Qtraded)}" y1="${Yr(Math.max(Pc,Pp))}" x2="${Xr(Qtraded)}" y2="${Yr(0)}"/>`;
+    }
+    guides += `</g>`;
+    svg += guides;
+
+    // free-market equilibrium dot
+    svg += `<circle cx="${Xr(m.Qe)}" cy="${Yr(m.Pe)}" r="4.5" fill="#fff" stroke="var(--equil)" stroke-width="2"/>`;
+
+    // ---- tax/subsidy wedge + draggable handle ----
+    svg += labs;
+    if(showWedge){
+      const xw=Xr(Qtraded);
+      const yc=Yr(Pc), yp=Yr(Pp);
+      // consumer & producer price dots
+      svg += `<circle cx="${xw}" cy="${yc}" r="4" fill="var(--demand)"/>`;
+      svg += `<circle cx="${xw}" cy="${yp}" r="4" fill="var(--supply)"/>`;
+      // wedge bar
+      svg += `<line x1="${xw}" y1="${yc}" x2="${xw}" y2="${yp}" stroke="var(--equil)" stroke-width="2"/>`;
+      // grab handle (a small rounded bar at the consumer-price end)
+      svg += `<g class="handle" id="grab"><rect x="${xw-13}" y="${(m.mode==='subsidy'?yp:yc)-7}" width="26" height="14" rx="4" fill="#fff" stroke="var(--equil)" stroke-width="1.5"/>`+
+             `<line x1="${xw-5}" y1="${(m.mode==='subsidy'?yp:yc)-2.5}" x2="${xw+5}" y2="${(m.mode==='subsidy'?yp:yc)-2.5}" stroke="var(--muted)" stroke-width="1.2"/>`+
+             `<line x1="${xw-5}" y1="${(m.mode==='subsidy'?yp:yc)+2.5}" x2="${xw+5}" y2="${(m.mode==='subsidy'?yp:yc)+2.5}" stroke="var(--muted)" stroke-width="1.2"/></g>`;
+      // price ticks on axis
+      svg += priceTick(Pc,"var(--demand)","Pc");
+      svg += priceTick(Pp,"var(--supply)","Pp");
+    } else {
+      svg += priceTick(m.Pe,"var(--equil)","P*");
+    }
+
+    // ---- axes ----
+    svg += `<line class="axis-line" x1="${M.l}" y1="${M.t}" x2="${M.l}" y2="${M.t+PH}"/>`;
+    svg += `<line class="axis-line" x1="${M.l}" y1="${M.t+PH}" x2="${M.l+PW}" y2="${M.t+PH}"/>`;
+    // axis numbers
+    for(let p=0;p<=100;p+=20){ svg+=`<text x="${M.l-8}" y="${Yr(p)+3.5}" text-anchor="end" font-size="10" fill="var(--faint)">${p}</text>`; }
+    for(let q=0;q<=QMAX;q+=20){ svg+=`<text x="${Xr(q)}" y="${M.t+PH+16}" text-anchor="middle" font-size="10" fill="var(--faint)">${q}</text>`; }
+    svg += `<text x="${M.l-40}" y="${M.t+10}" font-size="11" font-weight="600" fill="var(--muted)">Price</text>`;
+    svg += `<text x="${M.l+PW}" y="${M.t+PH+34}" text-anchor="end" font-size="11" font-weight="600" fill="var(--muted)">Quantity</text>`;
+
+    // ---- curve labels ----
+    const dLx=Xr(m.a/m.b*0.78), dLy=Yr(m.a-m.b*(m.a/m.b*0.78))-6;
+    svg += `<text class="curvelabel" x="${dLx}" y="${dLy}" fill="var(--demand)" text-anchor="middle">D</text>`;
+    const sLq=Math.min(supTopQ*0.82,QMAX*0.9), sLp=m.c+m.d*sLq;
+    svg += `<text class="curvelabel" x="${Xr(sLq)+10}" y="${Yr(sLp)}" fill="var(--supply)" text-anchor="start">S</text>`;
+
+    chart.innerHTML = svg;
+    attachDrag();
+    updatePanel(m);
+  }
+
+function renderExt(m){
+    let svg = `<defs><clipPath id="plot"><rect x="${M.l}" y="${M.t}" width="${PW}" height="${PH}"/></clipPath></defs>`;
+    // grid
+    for(let q=0;q<=QMAX;q+=20){ svg+=`<line class="gridline" x1="${Xr(q)}" y1="${M.t}" x2="${Xr(q)}" y2="${M.t+PH}"/>`; }
+    for(let p=0;p<=PMAX;p+=20){ svg+=`<line class="gridline" x1="${M.l}" y1="${Yr(p)}" x2="${M.l+PW}" y2="${Yr(p)}"/>`; }
+
+    const {a,b,c,d,Qm,Pm,A,C,Qeff,SBstar,SB,SC,isNeg,extSide}=m;
+    const hasE = m.e>1e-9;
+
+    // ---- shaded regions ----
+    let reg="";
+    if(layers.cs){ reg += poly([[0,Pm],[0,a],[Qm,Pm]], "var(--demand-fill)"); }
+    if(layers.ps){ reg += poly([[0,c],[0,Pm],[Qm,Pm]], "var(--supply-fill)"); }
+    // external-effect band (between private and social marginal curve over 0..Qm)
+    if(layers.gov && hasE){
+      if(extSide==="production"){
+        reg += poly([[0,c],[0,C],[Qm,SC(Qm)],[Qm,c+d*Qm]], "var(--social-fill)");
+      } else {
+        reg += poly([[0,a],[0,A],[Qm,SB(Qm)],[Qm,a-b*Qm]], "var(--social-fill)");
+      }
+    }
+    // DWL triangle between Qeff and Qm, bounded by MSB and MSC
+    if(layers.dwl && hasE){
+      reg += poly([[Qeff,SBstar],[Qm,SB(Qm)],[Qm,SC(Qm)]], "var(--dwl-fill)");
+    }
+    svg += `<g clip-path="url(#plot)">${reg}</g>`;
+
+    // region labels
+    if(hasE){
+      if(layers.gov){
+        const lbl = isNeg? "External cost" : "External benefit";
+        const pts = extSide==="production"
+          ? [[0,c],[0,C],[Qm,SC(Qm)],[Qm,c+d*Qm]]
+          : [[0,a],[0,A],[Qm,SB(Qm)],[Qm,a-b*Qm]];
+        svg += regLabel(pts, lbl, "var(--social)");
+      }
+      if(layers.dwl && Math.abs(Qeff-Qm)>3){
+        svg += regLabel([[Qeff,SBstar],[Qm,SB(Qm)],[Qm,SC(Qm)]], "DWL", "var(--dwl)");
+      }
+    }
+
+    // ---- curves ----
+    let cv=`<g clip-path="url(#plot)">`;
+    // private demand (MPB) and supply (MPC)
+    cv += `<line class="curve d" x1="${Xr(0)}" y1="${Yr(a)}" x2="${Xr(a/b)}" y2="${Yr(0)}"/>`;
+    const supTopQ=Math.min(QMAX,(PMAX-c)/d);
+    cv += `<line class="curve s" x1="${Xr(0)}" y1="${Yr(c)}" x2="${Xr(supTopQ)}" y2="${Yr(c+d*supTopQ)}"/>`;
+    // social marginal curve (the shifted one) — dashed
+    if(hasE){
+      if(extSide==="production"){
+        const top=Math.min(QMAX,(PMAX-C)/d);
+        cv += `<line class="curve social" x1="${Xr(0)}" y1="${Yr(C)}" x2="${Xr(top)}" y2="${Yr(C+d*top)}"/>`;
+      } else {
+        cv += `<line class="curve social" x1="${Xr(0)}" y1="${Yr(A)}" x2="${Xr(A/b)}" y2="${Yr(0)}"/>`;
+      }
+    }
+    cv += `</g>`;
+    svg += cv;
+
+    // ---- guides + points ----
+    svg += `<g clip-path="url(#plot)">`;
+    svg += `<line class="guide" x1="${Xr(Qm)}" y1="${Yr(Pm)}" x2="${Xr(Qm)}" y2="${Yr(0)}"/>`;
+    if(hasE) svg += `<line x1="${Xr(Qeff)}" y1="${Yr(SBstar)}" x2="${Xr(Qeff)}" y2="${Yr(0)}" stroke="var(--social)" stroke-width="1.2" stroke-dasharray="3 4" opacity="0.7"/>`;
+    svg += `</g>`;
+    // market equilibrium (open dark dot) — where the PRIVATE curves cross
+    svg += `<circle cx="${Xr(Qm)}" cy="${Yr(Pm)}" r="5" fill="#fff" stroke="var(--equil)" stroke-width="2.4"/>`;
+    // efficient / socially optimal allocation (teal diamond) — where the SOCIAL curves cross
+    if(hasE){
+      const ex=Xr(Qeff), ey=Yr(SBstar), r=6;
+      svg += `<path d="M ${ex} ${ey-r} L ${ex+r} ${ey} L ${ex} ${ey+r} L ${ex-r} ${ey} Z" fill="var(--social)" stroke="#fff" stroke-width="1.6"/>`;
+    }
+    // arrow callouts — higher-price point labelled above, lower-price below, so they never overlap
+    if(hasE && Math.abs(Qeff-Qm)>3){
+      const effHigher = SBstar > Pm;
+      svg += arrowLabel(Qeff, SBstar, "Efficient quantity", "var(--social)", effHigher? "up":"down");
+      svg += arrowLabel(Qm,   Pm,     "Market equilibrium", "var(--equil)",  effHigher? "down":"up");
+      svg += `<text x="${Xr(Qm)}" y="${M.t+PH+27}" text-anchor="middle" font-size="9.5" font-weight="600" fill="var(--equil)" font-family="var(--disp)">Q\u2098</text>`;
+      svg += `<text x="${Xr(Qeff)}" y="${M.t+PH+27}" text-anchor="middle" font-size="9.5" font-weight="600" fill="var(--social)" font-family="var(--disp)">Q*</text>`;
+    } else {
+      svg += arrowLabel(Qm, Pm, "Equilibrium", "var(--equil)", "up");
+    }
+    svg += priceTick(Pm,"var(--equil)","Pm");
+
+    // ---- axes ----
+    svg += `<line class="axis-line" x1="${M.l}" y1="${M.t}" x2="${M.l}" y2="${M.t+PH}"/>`;
+    svg += `<line class="axis-line" x1="${M.l}" y1="${M.t+PH}" x2="${M.l+PW}" y2="${M.t+PH}"/>`;
+    for(let p=0;p<=100;p+=20){ svg+=`<text x="${M.l-8}" y="${Yr(p)+3.5}" text-anchor="end" font-size="10" fill="var(--faint)">${p}</text>`; }
+    for(let q=0;q<=QMAX;q+=20){ svg+=`<text x="${Xr(q)}" y="${M.t+PH+16}" text-anchor="middle" font-size="10" fill="var(--faint)">${q}</text>`; }
+    svg += `<text x="${M.l-40}" y="${M.t+10}" font-size="11" font-weight="600" fill="var(--muted)">Price</text>`;
+    svg += `<text x="${M.l+PW}" y="${M.t+PH+34}" text-anchor="end" font-size="11" font-weight="600" fill="var(--muted)">Quantity</text>`;
+
+    // ---- curve labels ----
+    const dLx=Xr(a/b*0.74), dLy=Yr(a-b*(a/b*0.74))-6;
+    svg += `<text class="curvelabel" x="${dLx}" y="${dLy}" fill="var(--demand)" text-anchor="middle">D = MPB</text>`;
+    const sLq=Math.min(supTopQ*0.8,QMAX*0.88), sLp=c+d*sLq;
+    svg += `<text class="curvelabel" x="${Xr(sLq)+8}" y="${Yr(sLp)}" fill="var(--supply)" text-anchor="start">S = MPC</text>`;
+    if(hasE){
+      const sLabel = extSide==="production" ? "MSC" : "MSB";
+      if(extSide==="production"){
+        const lq=Math.min((PMAX-C)/d*0.66,QMAX*0.7), lp=C+d*lq;
+        svg += `<text class="curvelabel social" x="${Xr(lq)-6}" y="${Yr(lp)-6}" text-anchor="end">${sLabel}</text>`;
+      } else {
+        const lq=A/b*0.5, lp=A-b*lq;
+        svg += `<text class="curvelabel social" x="${Xr(lq)+8}" y="${Yr(lp)-5}" text-anchor="start">${sLabel}</text>`;
+      }
+    }
+
+    chart.innerHTML=svg;
+    updatePanel(m);
+  }
+
+function priceTick(p,color,label){
+    const y=Yr(p);
+    return `<g><line x1="${M.l-3}" y1="${y}" x2="${M.l+3}" y2="${y}" stroke="${color}" stroke-width="2"/>`+
+           `<text x="${M.l-9}" y="${y+3}" text-anchor="end" font-size="9.5" font-weight="600" fill="${color}">${Math.round(p)}</text></g>`;
+  }
+
+function attachDrag(){
+    const grab=document.getElementById("grab");
+    if(!grab) return;
+    grab.addEventListener("pointerdown",e=>{ dragging=true; chart.setPointerCapture?.(e.pointerId); e.preventDefault(); });
+  }
+
+function pointerToValue(clientY){
+    const rect=chart.getBoundingClientRect();
+    const scale=VB.h/rect.height;
+    const svgY=(clientY-rect.top)*scale;
+    const p = PMAX*(1 - (svgY-M.t)/PH);          // price under the cursor
+    const m=model();
+    // tax = Pc - Pp at the traded Q. With cursor at consumer price end:
+    // approximate target intervention as distance from efficient price, doubled-> map directly:
+    let g;
+    if(S.mode==="subsidy"){ g = (m.Pe - p)*2 * 0; } // placeholder, recompute below
+    // Simpler robust mapping: set traded quantity from cursor price on the *demand* curve,
+    // then back out g = (b+d)*(Qe - Q)  [tax]  or (b+d)*(Q - Qe) [subsidy]
+    let q=(S.a - p)/S.b;                            // quantity at that consumer price on demand
+    q=Math.max(0,Math.min(QMAX,q));
+    if(S.mode==="subsidy"){ g=(S.b+S.d)*(q-m.Qe); }
+    else { g=(S.b+S.d)*(m.Qe-q); }
+    return Math.max(0,Math.min(40,g));
+  }
+
+function updatePanel(m){
+    if(m.mode==="externality"){ updatePanelExt(m); return; }
+    // insight sentence
+    const ins=$("#insight");
+    if(!m.valid){ ins.innerHTML=`<span class="lead">Reading</span>No equilibrium: lower the supply position or raise demand.`; }
+    else if(m.mode==="none"){
+      ins.innerHTML=`<span class="lead">Free market</span>Equilibrium at <b>Q* = ${num(m.Qe)}</b>, <b>P* = ${money(m.Pe)}</b>. Demand elasticity |ε| = <b>${isFinite(m.eD)?m.eD.toFixed(2):'∞'}</b>, supply ε = <b>${isFinite(m.eS)?m.eS.toFixed(2):'∞'}</b>. Add a tax or subsidy to see the welfare effects.`;
+    } else if(m.g<1e-9){
+      const word=m.mode==="tax"?"tax":"subsidy";
+      ins.innerHTML=`<span class="lead">${m.mode}</span>Set a ${word} above zero — drag the slider or the wedge — to see incidence and deadweight loss.`;
+    } else if(m.mode==="tax"){
+      const dMoreElastic = m.eD > m.eS + 1e-6;
+      const sMoreElastic = m.eS > m.eD + 1e-6;
+      if(!dMoreElastic && !sMoreElastic){
+        ins.innerHTML=`<span class="lead">Tax incidence</span>Demand and supply are about equally elastic, so the tax splits roughly <b>50/50</b>. Trade falls from <b>${num(m.Qe)}</b> to <b>${num(m.Q)}</b> units, creating <b>${money(m.DWL)}</b> of deadweight loss while raising <b>${money(m.gov)}</b>.`;
+      } else {
+        const escaper = dMoreElastic ? "Consumers" : "Producers";
+        const bearer  = dMoreElastic ? "producers" : "consumers";
+        const bearShare = dMoreElastic ? m.prodShare : m.consShare;
+        ins.innerHTML=`<span class="lead">Tax incidence</span><b>${escaper}</b> are the more elastic side, so they escape most of the tax — the more inelastic <b>${bearer}</b> are left bearing <b>${pct(bearShare)}</b> of it. Trade falls from <b>${num(m.Qe)}</b> to <b>${num(m.Q)}</b> units, creating <b>${money(m.DWL)}</b> of deadweight loss while raising <b>${money(m.gov)}</b>.`;
+      }
+    } else {
+      const dMoreElastic = m.eD > m.eS + 1e-6;
+      const sMoreElastic = m.eS > m.eD + 1e-6;
+      if(!dMoreElastic && !sMoreElastic){
+        ins.innerHTML=`<span class="lead">Subsidy</span>With similar elasticities the subsidy is shared roughly <b>50/50</b>. It pushes trade above the efficient level (from <b>${num(m.Qe)}</b> to <b>${num(m.Q)}</b> units). The <b>${money(m.gov)}</b> of government spending is a transfer to the market, but <b>${money(m.DWL)}</b> of it is pure deadweight loss — the extra units cost more to make than they're worth.`;
+      } else {
+        const capturer = dMoreElastic ? "Producers" : "Consumers";
+        const passer   = dMoreElastic ? "consumers" : "producers";
+        const capShare = dMoreElastic ? m.prodShare : m.consShare;
+        ins.innerHTML=`<span class="lead">Subsidy</span><b>${capturer}</b> are the more inelastic side, so they capture most of the subsidy — <b>${pct(capShare)}</b> of it. It pushes trade above the efficient level (from <b>${num(m.Qe)}</b> to <b>${num(m.Q)}</b>). Of the <b>${money(m.gov)}</b> the government spends — a transfer — <b>${money(m.DWL)}</b> is wasted as deadweight loss, the cost of over-producing.`;
+      }
+    }
+
+    // stat cards
+    const cards=[];
+    cards.push(card("Equilibrium price", m.mode==="none"||m.g<1e-9? money(m.Pe): `${money(m.Pc)} / ${money(m.Pp)}`,
+      m.mode==="none"||m.g<1e-9? "P*" : "consumers pay / producers get", null));
+    cards.push(card("Quantity traded", num(m.Q), m.mode!=="none"&&m.g>1e-9? `efficient: ${num(m.Qe)}`:"units", null));
+
+    if(m.mode==="tax"){
+      cards.push(card("Tax revenue", money(m.gov), `${money(m.g)} × ${num(m.Q)}`, "var(--revenue)"));
+      cards.push(card("Deadweight loss", money(m.DWL), "lost gains from trade", "var(--dwl)"));
+    } else if(m.mode==="subsidy"){
+      cards.push(card("Government spending", money(m.gov), "transfer to the market", "var(--revenue)"));
+      cards.push(card("Deadweight loss", money(m.DWL), "waste from over-production", "var(--dwl)"));
+    } else {
+      cards.push(card("Consumer surplus", money(m.CS), null, "var(--demand)"));
+      cards.push(card("Producer surplus", money(m.PS), null, "var(--supply)"));
+    }
+    $("#stats").innerHTML = cards.join("");
+
+    // elasticity card row (always show as wide pair)
+    $("#stats").insertAdjacentHTML("beforeend",
+      `<div class="stat"><div class="k"><span class="sw" style="background:var(--demand)"></span>Demand elasticity</div>`+
+      `<div class="v">${isFinite(m.eD)?m.eD.toFixed(2):'∞'}</div><div class="sub">|%ΔQ / %ΔP| at P*</div></div>`+
+      `<div class="stat"><div class="k"><span class="sw" style="background:var(--supply)"></span>Supply elasticity</div>`+
+      `<div class="v">${isFinite(m.eS)?m.eS.toFixed(2):'∞'}</div><div class="sub">%ΔQ / %ΔP at P*</div></div>`);
+
+    // burden / benefit bar (tax and subsidy)
+    const bc=$("#burdenCard");
+    if((m.mode==="tax"||m.mode==="subsidy") && m.g>1e-9){
+      bc.style.display="";
+      const cs=Math.round((m.consShare||0)*100), ps=100-cs;
+      $("#segC").style.width=cs+"%"; $("#segP").style.width=ps+"%";
+      $("#segC").textContent= cs>=14? cs+"%":"";
+      $("#segP").textContent= ps>=14? ps+"%":"";
+      $("#burdenTitle").textContent = m.mode==="tax" ? "Tax burden split" : "Subsidy benefit split";
+      const eDs=isFinite(m.eD)?m.eD.toFixed(2):"∞", eSs=isFinite(m.eS)?m.eS.toFixed(2):"∞";
+      const note=$("#elasNote");
+      const dMoreElastic = m.eD > m.eS + 1e-6, sMoreElastic = m.eS > m.eD + 1e-6;
+      if(!dMoreElastic && !sMoreElastic){
+        note.innerHTML = `Demand ε <b>${eDs}</b> ≈ supply ε <b>${eSs}</b> — neither side can adjust more, so it splits evenly.`;
+      } else if(m.mode==="tax"){
+        const who = dMoreElastic ? "consumers" : "producers";
+        note.innerHTML = `Higher elasticity = more room to escape. Demand ε <b>${eDs}</b> vs supply ε <b>${eSs}</b> → the more elastic ${who} shift the burden onto the other side.`;
+      } else {
+        const who = dMoreElastic ? "producers" : "consumers";
+        note.innerHTML = `Lower elasticity = a bigger slice of the subsidy. Demand ε <b>${eDs}</b> vs supply ε <b>${eSs}</b> → the more inelastic ${who} capture most of it.`;
+      }
+    } else { bc.style.display="none"; }
+
+    // welfare table
+    const govLab = m.mode==="subsidy"?"Government spending":"Tax revenue";
+    const rows=[
+      `<div class="wrow"><span>component</span><span>before</span><span>after</span></div>`,
+      wrow("Consumer surplus", m.CSe, m.CS),
+      wrow("Producer surplus", m.PSe, m.PS),
+    ];
+    if(m.mode!=="none"){
+      const after = m.mode==="subsidy"? -m.gov : m.gov;
+      rows.push(`<div class="wrow"><span class="nm">${govLab}</span><span>—</span><span class="${after<0?'neg':'pos'}">${(after<0?'−':'')+money(Math.abs(after))}</span></div>`);
+    }
+    rows.push(`<div class="wrow"><span class="nm">Total surplus</span><span>${money(m.TSe)}</span><span>${money(m.TS)}</span></div>`);
+    if(m.mode==="tax"||m.mode==="subsidy"){
+      rows.push(`<div class="wrow"><span class="nm">Deadweight loss</span><span>—</span><span class="neg">−${money(m.DWL)}</span></div>`);
+    }
+    $("#wtable").innerHTML=rows.join("");
+  }
+
+function updatePanelExt(m){
+    const ins=$("#insight");
+    $("#burdenCard").style.display="none";
+    if(!m.valid){
+      ins.innerHTML=`<span class="lead">Reading</span>No valid market: adjust the curves so demand sits above supply.`;
+      $("#stats").innerHTML=""; $("#wtable").innerHTML=""; return;
+    }
+    const side=m.extSide, neg=m.isNeg;
+    const sideWord = side==="production"?"production":"consumption";
+    if(m.e<1e-9){
+      ins.innerHTML=`<span class="lead">${neg?"Negative":"Positive"} ${sideWord} externality</span>Increase the external effect to split the private and social marginal curves and reveal the efficient allocation.`;
+    } else {
+      const over = neg;                       // negative → market does too much
+      const verb = side==="production"
+        ? (over?"over-produces":"under-produces")
+        : (over?"over-consumes":"under-consumes");
+      const why = side==="production"
+        ? (neg?"marginal social cost exceeds private cost (MSC &gt; MPC)"
+              :"production creates benefits the firm ignores (MSC &lt; MPC)")
+        : (neg?"marginal social benefit is below private benefit (MSB &lt; MPB)"
+              :"consumption benefits others too (MSB &gt; MPB)");
+      const fix = neg?`a corrective (Pigouvian) tax of ${money(m.e)}/unit`
+                     :`a corrective subsidy of ${money(m.e)}/unit`;
+      ins.innerHTML=`<span class="lead">${neg?"Negative":"Positive"} ${sideWord} externality</span>`+
+        `Because ${why}, the market <b>${verb}</b>: it trades <b>${num(m.Qm)}</b> units, but <b>${num(m.Qeff)}</b> is efficient. `+
+        `The misallocation costs <b>${money(m.DWL)}</b> in deadweight loss — ${fix} would close the gap.`;
+    }
+
+    const cards=[];
+    cards.push(card("Market quantity", num(m.Qm), m.e>1e-9?`efficient: ${num(m.Qeff)}`:"units", "var(--equil)"));
+    cards.push(card("Market price", money(m.Pm), "where MPB = MPC", null));
+    cards.push(card("Consumer surplus", money(m.CS), "at the market outcome", "var(--demand)"));
+    cards.push(card("Producer surplus", money(m.PS), "at the market outcome", "var(--supply)"));
+    cards.push(card(neg?"External cost":"External benefit", money(m.externalTotal),
+                    `${money(m.e)} × ${num(m.Qm)} units`, "var(--social)"));
+    cards.push(card("Deadweight loss", money(m.DWL), "from misallocation", "var(--dwl)"));
+    cards.push(`<div class="stat"><div class="k"><span class="sw" style="background:var(--demand)"></span>Demand elasticity</div>`+
+               `<div class="v">${isFinite(m.eD)?m.eD.toFixed(2):'∞'}</div><div class="sub">|%ΔQ / %ΔP| at Pm</div></div>`);
+    cards.push(`<div class="stat"><div class="k"><span class="sw" style="background:var(--supply)"></span>Supply elasticity</div>`+
+               `<div class="v">${isFinite(m.eS)?m.eS.toFixed(2):'∞'}</div><div class="sub">%ΔQ / %ΔP at Pm</div></div>`);
+    $("#stats").innerHTML=cards.join("");
+
+    const extLab = neg?"External cost":"External benefit";
+    const extSigned = (neg?"−":"+")+money(m.externalTotal);
+    const rows=[
+      `<div class="wrow"><span>component</span><span></span><span>amount</span></div>`,
+      `<div class="wrow"><span class="nm">Consumer surplus</span><span></span><span>${money(m.CS)}</span></div>`,
+      `<div class="wrow"><span class="nm">Producer surplus</span><span></span><span>${money(m.PS)}</span></div>`,
+      `<div class="wrow"><span class="nm">${extLab}</span><span></span><span class="${neg?'neg':'pos'}">${extSigned}</span></div>`,
+      `<div class="wrow"><span class="nm">Social surplus (market)</span><span></span><span>${money(m.SSm)}</span></div>`,
+      `<div class="wrow"><span class="nm">Social surplus (efficient)</span><span></span><span>${money(m.SSeff)}</span></div>`,
+      `<div class="wrow"><span class="nm">Deadweight loss</span><span></span><span class="neg">−${money(m.DWL)}</span></div>`
+    ];
+    $("#wtable").innerHTML=rows.join("");
+  }
+
+function card(k,v,sub,col){
+    const sw = col? `<span class="sw" style="background:${col}"></span>`:"";
+    return `<div class="stat"><div class="k">${sw}${k}</div><div class="v">${v}</div>${sub?`<div class="sub">${sub}</div>`:""}</div>`;
+  }
+
+function wrow(name,before,after){
+    const diff=after-before;
+    return `<div class="wrow"><span class="nm">${name}</span><span>${money(before)}</span>`+
+           `<span class="${diff<0?'neg':(diff>0?'pos':'')}">${money(after)}</span></div>`;
+  }
+
+
+
+  // ---------- drag the wedge ----------
+  let dragging=false;
+  window.addEventListener("pointermove",e=>{
+    if(!dragging) return;
+    S.t = +pointerToValue(e.clientY).toFixed(1);
+    $("#t").value=S.t; syncTrackFills();
+    render();
+  });
+  window.addEventListener("pointerup",()=>{ dragging=false; });
+
+  // ---------- track fills + labels ----------
+  function fillTrack(input,frac,color){
+    const pctv=Math.round(frac*100);
+    input.style.setProperty("--trk",`linear-gradient(90deg, ${color} 0 ${pctv}%, #cdd6de ${pctv}% 100%)`);
+  }
+  function syncTrackFills(){
+    fillTrack($("#a"),(S.a-60)/(100-60),"var(--demand)");
+    fillTrack($("#b"),(S.b-0.35)/(4-0.35),"var(--demand)");
+    fillTrack($("#c"),(S.c-0)/(45-0),"var(--supply)");
+    fillTrack($("#d"),(S.d-0.3)/(4-0.3),"var(--supply)");
+    fillTrack($("#t"),(S.t-0)/(40-0), S.mode==="subsidy"?"var(--revenue)":"var(--ink)");
+    if($("#e")) fillTrack($("#e"),(S.e-0)/(35-0),"var(--social)");
+    $("#aVal").textContent="a = "+S.a;
+    $("#bVal").textContent="b = "+S.b.toFixed(2);
+    $("#cVal").textContent="c = "+S.c;
+    $("#dVal").textContent="d = "+S.d.toFixed(2);
+    $("#tVal").textContent=money(S.t);
+    if($("#eVal")) $("#eVal").textContent=money(S.e);
+    const eh=$("#eHint");
+    if(eh){ eh.textContent = S.extSign==="neg"
+      ? "Gap between the private and social marginal curves (third-party harm)."
+      : "Gap between the private and social marginal curves (third-party benefit)."; }
+    if(S.mode==="externality"){
+      $("#govChipLabel").textContent = S.extSign==="neg" ? "External cost" : "External benefit";
+    }
+  }
+
+  // ---------- wiring ----------
+  function bindSlider(id,key){
+    const el=$("#"+id); el.value=S[key];
+    el.addEventListener("input",()=>{ S[key]=+el.value; syncTrackFills(); render(); });
+  }
+  ["a","b","c","d","t","e"].forEach(k=>bindSlider(k,k));
+
+  function bindSeg(groupId,key){
+    document.querySelectorAll("#"+groupId+" button").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        S[key]=btn.dataset.v;
+        document.querySelectorAll("#"+groupId+" button").forEach(b=>b.setAttribute("aria-pressed", b===btn?"true":"false"));
+        syncTrackFills(); render();
+      });
+    });
+  }
+  bindSeg("extSign","extSign");
+  bindSeg("extSide","extSide");
+
+  // layer chips
+  document.querySelectorAll("#layers .chip").forEach(chip=>{
+    chip.addEventListener("click",()=>{
+      const k=chip.dataset.k; layers[k]=!layers[k];
+      chip.setAttribute("aria-pressed",layers[k]?"true":"false");
+      render();
+    });
+  });
+
+  // presets (gentle tween)
+  const reduce=(typeof matchMedia==="function") && matchMedia("(prefers-reduced-motion:reduce)").matches;
+  document.querySelectorAll("#presets button").forEach(btn=>{
+    btn.addEventListener("click",()=>{ const tgt=presets[btn.dataset.p]; if(tgt) tweenTo(tgt); });
+  });
+  let raf=null;
+  function tweenTo(target){
+    if(reduce){ Object.assign(S,target); after(); return; }
+    cancelAnimationFrame(raf);
+    const from={a:S.a,b:S.b,c:S.c,d:S.d,t:S.t}, start=performance.now(), dur=420;
+    function step(now){
+      const k=Math.min(1,(now-start)/dur), e=1-Math.pow(1-k,3);
+      S.a=from.a+(target.a-from.a)*e; S.b=from.b+(target.b-from.b)*e;
+      S.c=from.c+(target.c-from.c)*e; S.d=from.d+(target.d-from.d)*e;
+      S.t=from.t+(target.t-from.t)*e;
+      sync(); render();
+      if(k<1) raf=requestAnimationFrame(step); else { Object.assign(S,target); after(); }
+    }
+    raf=requestAnimationFrame(step);
+  }
+  function sync(){ ["a","b","c","d","t"].forEach(k=>$("#"+k).value=S[k]); syncTrackFills(); }
+  function after(){ sync(); render(); }
+
+  // ---------- tabs (mode) ----------
+  function applyModeChips(){
+    const isSub=S.mode==="subsidy", isExt=S.mode==="externality", isTax=S.mode==="tax", isNone=S.mode==="none";
+    $("#govChipLabel").textContent = isExt ? (S.extSign==="neg"?"External cost":"External benefit")
+                                   : isSub ? "Govt spending" : "Tax revenue";
+    $("#govChip").style.display = isNone ? "none" : "";
+    $("#dwlChip").style.display = isNone ? "none" : "";
+  }
+  function setMode(mode){
+    S.mode=mode;
+    const isSub=mode==="subsidy", isExt=mode==="externality";
+    $("#taxSectLabel").textContent= isSub? "Per-unit subsidy" : "Per-unit tax";
+    $("#tLabel").textContent= isSub? "Subsidy" : "Tax";
+    $("#taxGroup").style.display = (mode==="tax"||mode==="subsidy") ? "" : "none";
+    $("#extGroup").style.display = isExt ? "" : "none";
+    applyModeChips(); syncTrackFills(); render();
+  }
+  window.__market = { setMode };
+})();
+
+</script>
+<script>
+
+(()=>{
+  "use strict";
+  const $=s=>document.querySelector(s);
+  const money=v=>"$"+(Math.abs(v)<10? v.toFixed(1): Math.round(v).toLocaleString());
+  const num=v=>(Math.abs(v)<10? v.toFixed(1): Math.round(v).toLocaleString());
+
+  const F={p:50,fc:60,run:"SR"};
+  const flayers={mc:true,atc:true,avc:true};
+
+  // VC(q)=1.5q³−12q²+44q  (FC added separately)
+  const VCq=q=>1.5*q*q*q-12*q*q+44*q;
+  const AVCq=q=>1.5*q*q-12*q+44;        // min 20 at q=4
+  const MCq=q=>4.5*q*q-24*q+44;         // crosses AVC & ATC at their minima
+  const ATCq=(q,fc)=>AVCq(q)+fc/q;
+  const MIN_AVC=20, Q_MIN_AVC=4;
+  const qStar=P=>(18*P-216)>=0 ? (24+Math.sqrt(18*P-216))/9 : 0;
+  function minATC(fc){ let best=1e9,bq=0; for(let q=1;q<=8;q+=0.002){const v=ATCq(q,fc); if(v<best){best=v;bq=q;}} return {price:best,q:bq}; }
+
+  function firmModel(){
+    const fc=F.fc, mAT=minATC(fc);
+    if(F.run==="LR"){
+      const P=mAT.price, q=mAT.q;
+      const TR=P*q, VC=VCq(q), TC=VC+fc, profit=TR-TC;     // ≈ 0
+      return {P,fc,q,TR,VC,TC,profit,atc:ATCq(q,fc),avc:AVCq(q),
+              minATC:mAT.price,minATCq:mAT.q,minAVC:MIN_AVC,minAVCq:Q_MIN_AVC,
+              regime:"longrun",run:"LR",supplyCutQ:mAT.q};
+    }
+    const P=F.p, operate=P>=MIN_AVC, q=operate?qStar(P):0;
+    const TR=P*q, VC=VCq(q), TC=VC+fc, profit=TR-TC;
+    let regime;
+    if(!operate) regime="shutdown";
+    else if(Math.abs(P-mAT.price)<0.06) regime="breakeven";   // P = min ATC → zero economic profit
+    else if(P>mAT.price) regime="profit";
+    else regime="loss";
+    return {P,fc,q,TR,VC,TC,profit,atc:q>0?ATCq(q,fc):null,avc:q>0?AVCq(q):null,
+            minATC:mAT.price,minATCq:mAT.q,minAVC:MIN_AVC,minAVCq:Q_MIN_AVC,
+            operate,regime,run:"SR",supplyCutQ:Q_MIN_AVC};
+  }
+
+  // geometry
+  const fchart=$("#fchart");
+  const VB={w:640,h:500}, M={l:54,r:22,t:20,b:46};
+  const PW=VB.w-M.l-M.r, PH=VB.h-M.t-M.b, QF=8, PF=100;
+  const XFr=q=>M.l+(q/QF)*PW, YFr=p=>M.t+(1-p/PF)*PH;
+  function fpath(fn,q0,q1,cls,extra){
+    let pts=[];
+    for(let q=q0;q<=q1+1e-9;q+=0.06){const v=fn(q); if(v<=PF*1.4&&v>=-5) pts.push(`${XFr(q).toFixed(1)},${YFr(v).toFixed(1)}`);}
+    if(pts.length<2) return "";
+    return `<polyline points="${pts.join(" ")}" class="curve ${cls}" fill="none" ${extra||""}/>`;
+  }
+
+  function renderFirm(){
+    const m=firmModel();
+    let svg=`<defs><clipPath id="fplot"><rect x="${M.l}" y="${M.t}" width="${PW}" height="${PH}"/></clipPath></defs>`;
+    for(let q=0;q<=QF;q+=1){ svg+=`<line class="gridline" x1="${XFr(q)}" y1="${M.t}" x2="${XFr(q)}" y2="${M.t+PH}"/>`; }
+    for(let p=0;p<=PF;p+=20){ svg+=`<line class="gridline" x1="${M.l}" y1="${YFr(p)}" x2="${M.l+PW}" y2="${YFr(p)}"/>`; }
+
+    if(m.q>0 && m.atc!=null && m.regime!=="longrun" && Math.abs(m.P-m.atc)>0.3){
+      const yP=YFr(m.P), yA=YFr(m.atc), xq=XFr(m.q), x0=XFr(0);
+      const fill=m.P>=m.atc?"var(--profit-fill)":"var(--loss-fill)";
+      svg+=`<g clip-path="url(#fplot)"><polygon points="${x0},${yP} ${xq},${yP} ${xq},${yA} ${x0},${yA}" fill="${fill}"/></g>`;
+      const cy=(yP+yA)/2, cx=(x0+xq)/2, lbl=m.P>=m.atc?"Profit":"Loss", col=m.P>=m.atc?"#15803d":"#b91c1c";
+      if(Math.abs(yP-yA)>14){
+        svg+=`<rect class="badge" x="${cx-22}" y="${cy-9}" width="44" height="17" rx="5"/>`+
+             `<text class="reglabel" x="${cx}" y="${cy+3.5}" text-anchor="middle" font-size="10.5" fill="${col}">${lbl}</text>`;
+      }
+    }
+
+    let cv=`<g clip-path="url(#fplot)">`;
+    if(flayers.avc) cv+=fpath(AVCq,0.2,QF,"avc");
+    if(flayers.atc) cv+=fpath(q=>ATCq(q,m.fc),0.7,QF,"atc");
+    if(flayers.mc){
+      const qc=m.supplyCutQ;
+      cv+=fpath(MCq,0.2,qc,"mc",'opacity="0.3"');        // not part of the supply curve
+      cv+=fpath(MCq,qc,QF,"supply-hi");                   // supply curve = MC above the cutoff
+    }
+    cv+=`</g>`; svg+=cv;
+
+    svg+=`<g clip-path="url(#fplot)"><line class="priceline" x1="${M.l}" y1="${YFr(m.P)}" x2="${M.l+PW}" y2="${YFr(m.P)}"/></g>`;
+    if(m.q>0){
+      svg+=`<g clip-path="url(#fplot)"><line class="guide" x1="${XFr(m.q)}" y1="${YFr(m.P)}" x2="${XFr(m.q)}" y2="${YFr(0)}"/></g>`;
+      const dotCol=m.regime==="longrun"?"var(--atc)":"var(--price)";
+      svg+=`<circle cx="${XFr(m.q)}" cy="${YFr(m.P)}" r="5" fill="#fff" stroke="${dotCol}" stroke-width="2.4"/>`;
+    }
+    svg+=`<circle cx="${XFr(m.minAVCq)}" cy="${YFr(m.minAVC)}" r="3.5" fill="var(--avc)" stroke="#fff" stroke-width="1.2"/>`;
+    svg+=`<circle cx="${XFr(m.minATCq)}" cy="${YFr(m.minATC)}" r="3.5" fill="var(--atc)" stroke="#fff" stroke-width="1.2"/>`;
+    if(m.regime==="longrun"){
+      const ex=XFr(m.q), ey=YFr(m.P);
+      svg+=`<rect class="badge" x="${ex-66}" y="${ey-28}" width="132" height="18" rx="5"/>`+
+           `<text class="reglabel" x="${ex}" y="${ey-15}" text-anchor="middle" font-size="10" fill="var(--atc)">P = MC = ATC · profit = 0</text>`;
+    }
+
+    svg+=`<line class="axis-line" x1="${M.l}" y1="${M.t}" x2="${M.l}" y2="${M.t+PH}"/>`;
+    svg+=`<line class="axis-line" x1="${M.l}" y1="${M.t+PH}" x2="${M.l+PW}" y2="${M.t+PH}"/>`;
+    for(let p=0;p<=PF;p+=20){ svg+=`<text x="${M.l-8}" y="${YFr(p)+3.5}" text-anchor="end" font-size="10" fill="var(--faint)">${p}</text>`; }
+    for(let q=0;q<=QF;q+=1){ svg+=`<text x="${XFr(q)}" y="${M.t+PH+16}" text-anchor="middle" font-size="10" fill="var(--faint)">${q}</text>`; }
+    svg+=`<text x="${M.l-40}" y="${M.t+10}" font-size="11" font-weight="600" fill="var(--muted)">$ / unit</text>`;
+    svg+=`<text x="${M.l+PW}" y="${M.t+PH+34}" text-anchor="end" font-size="11" font-weight="600" fill="var(--muted)">Quantity (q)</text>`;
+
+    if(flayers.mc){
+      svg+=`<text class="curvelabel" x="${XFr(6.5)}" y="${YFr(Math.min(MCq(6.5),96))}" fill="var(--mc)" text-anchor="start">MC</text>`;
+      const sq=m.run==="LR"?6.0:5.6, sp=Math.min(MCq(sq),90);
+      svg+=`<text class="curvelabel" x="${XFr(sq)-6}" y="${YFr(sp)+14}" fill="var(--mc)" text-anchor="end" font-size="10.5">${m.run==="LR"?"supply (LR)":"supply (SR)"}</text>`;
+    }
+    if(flayers.atc) svg+=`<text class="curvelabel" x="${XFr(7.3)}" y="${YFr(Math.min(ATCq(7.3,m.fc),92))-4}" fill="var(--atc)" text-anchor="start">ATC</text>`;
+    if(flayers.avc) svg+=`<text class="curvelabel" x="${XFr(7.3)}" y="${YFr(AVCq(7.0))-2}" fill="var(--avc)" text-anchor="start">AVC</text>`;
+    svg+=`<text class="curvelabel" x="${M.l+PW-4}" y="${YFr(m.P)-5}" fill="var(--price)" text-anchor="end" font-size="11">${m.run==="LR"?"P = min ATC":"P = MR"}</text>`;
+
+    fchart.innerHTML=svg;
+    updatePanel(m);
+  }
+
+  function card(k,v,sub,col){
+    const sw=col?`<span class="sw" style="background:${col}"></span>`:"";
+    return `<div class="stat"><div class="k">${sw}${k}</div><div class="v">${v}</div>${sub?`<div class="sub">${sub}</div>`:""}</div>`;
+  }
+
+  function updatePanel(m){
+    // price-taker framing (always shown, adapts to horizon)
+    const pt=$("#ptaker");
+    if(m.run==="LR"){
+      pt.innerHTML=`<span class="tag">price-taker</span><span>The firm still takes the price as given — it never sets it. In the long run the market itself is pinned down: free entry and exit drive the price to <b>minimum ATC</b>.</span>`;
+    } else {
+      pt.innerHTML=`<span class="tag">price-taker</span><span>The firm can't choose its price — it takes whatever the market gives. Here <b>you play the market</b> and pick a price to see how the firm responds.</span>`;
+    }
+
+    const ins=$("#finsight");
+    const tag=m.regime==="profit"?`<span class="regime profit">economic profit</span>`
+            :m.regime==="loss"?`<span class="regime loss">loss · still operating</span>`
+            :m.regime==="shutdown"?`<span class="regime shut">shut down</span>`
+            :m.regime==="breakeven"?`<span class="regime profit">break-even · zero profit</span>`
+            :`<span class="regime profit">long-run equilibrium · zero profit</span>`;
+    let body;
+    if(m.regime==="longrun"){
+      body=`Free entry and exit drive the market price to <b>minimum ATC = ${money(m.P)}</b>. The firm produces <b>${num(m.q)}</b> units (its efficient scale), where <b>P = MC = ATC</b>, so economic profit is exactly <b>$0</b>. The rising part of MC above min ATC is the long-run supply curve; the stretch below ATC is never used. Raise fixed cost to push this price up.`;
+    } else if(m.regime==="breakeven"){
+      body=`This is the <b>break-even price</b>: it equals minimum ATC (<b>${money(m.minATC)}</b>), so the firm produces <b>${num(m.q)}</b> units where <b>P = MC = ATC</b>. Total revenue exactly covers total cost, giving <b>$0</b> economic profit — <b>not</b> a loss. (Economic cost already includes a normal return, so zero economic profit still means the owners earn what they'd get elsewhere.) A hair lower and it loses money; a hair higher and it profits.`;
+    } else if(m.regime==="profit"){
+      body=`Taking the price <b>${money(m.P)}</b> as given, the firm makes <b>${num(m.q)}</b> units where <b>P = MC</b>. Price clears ATC (<b>${money(m.atc)}</b>), so it earns <b>${money(m.profit)}</b> profit. That profit would attract entry — switch to Long run to see where it ends.`;
+    } else if(m.regime==="loss"){
+      body=`Taking the price <b>${money(m.P)}</b>, the firm makes <b>${num(m.q)}</b> units (P = MC). Price covers AVC (<b>${money(m.avc)}</b>) but not full ATC (<b>${money(m.atc)}</b>), a <b>${money(-m.profit)}</b> loss. It still operates, since revenue above variable cost defrays part of the fixed cost — shutting down would cost the whole <b>${money(m.fc)}</b>.`;
+    } else {
+      body=`The price <b>${money(m.P)}</b> is below the shutdown point (min AVC = <b>${money(m.minAVC)}</b>). It wouldn't even cover variable cost, so the firm makes <b>q = 0</b> in the short run and eats its fixed cost as a <b>${money(m.fc)}</b> loss.`;
+    }
+    ins.innerHTML=`<span class="lead">The firm's decision</span>${tag}<br>${body}`;
+
+    const zeroP = m.regime==="longrun"||m.regime==="breakeven";
+    const profStr=zeroP?"$0":(m.profit>=0?"":"−")+money(Math.abs(m.profit));
+    const profSub=zeroP?"zero economic profit":(m.profit>=0?"TR − TC":"loss");
+    const cards=[
+      card("Output q*", m.q>0?num(m.q):"0", m.q>0?"where P = MC":"not producing","var(--price)"),
+      card("Profit", profStr, profSub, m.profit>=-0.01?"var(--revenue)":"var(--dwl)"),
+      card("Total revenue", money(m.TR), `${money(m.P)} × ${m.q>0?num(m.q):"0"}`, null),
+      card("Total cost", money(m.TC), `VC ${money(m.VC)} + FC ${money(m.fc)}`, null),
+      card("Shutdown price", money(m.minAVC), "minimum AVC","var(--avc)"),
+      card("Break-even price", money(m.minATC), "minimum ATC","var(--atc)")
+    ];
+    $("#fstats").innerHTML=cards.join("");
+  }
+
+  const firmExplain=`
+    <h2>How a competitive firm decides what to produce</h2>
+    <p class="sub">A price-taker compares the market price (its marginal revenue) with its own marginal cost, then checks whether the resulting output is worth keeping the doors open.</p>
+    <div class="exgrid">
+      <div class="exitem span2"><h3>The cost functions used here</h3>
+        <p>Variable cost is the cubic \\(VC(q) = 1.5q^{3} - 12q^{2} + 44q\\), which produces the familiar U-shaped average curves. From it: \\(AVC = 1.5q^{2} - 12q + 44\\) (minimum $20 at \\(q = 4\\)), \\(MC = 4.5q^{2} - 24q + 44\\), and with fixed cost \\(FC\\), \\(ATC = AVC + \\dfrac{FC}{q}\\) while \\(TC = VC + FC\\). The firm's output solves \\(P = MC\\); the minimum of ATC (located numerically) is the break-even price and the minimum of AVC is the shutdown price.</p></div>
+      <div class="exitem"><h3><span class="sw" style="background:var(--mc)"></span>Marginal cost (MC)</h3>
+        <p>The cost of one more unit. It falls then rises, and cuts through the average-cost curves at their lowest points. <span class="term">The rising part of MC is the firm's supply curve.</span></p></div>
+      <div class="exitem"><h3><span class="sw" style="background:var(--avc)"></span>Average variable cost (AVC)</h3>
+        <p>Variable cost per unit. Its minimum is the <b>shutdown price</b>: below it, selling can't even cover the cost of producing, so the firm stops in the short run.</p></div>
+      <div class="exitem"><h3><span class="sw" style="background:var(--atc)"></span>Average total cost (ATC)</h3>
+        <p>All cost per unit — fixed plus variable. Its minimum is the <b>break-even price</b>: above it the firm profits, below it the firm loses. The vertical gap between ATC and AVC is average fixed cost, which shrinks as output spreads the overhead.</p></div>
+      <div class="exitem"><h3>Fixed vs. variable cost</h3>
+        <p>Fixed cost is owed whether or not the firm produces (rent, machines). Variable cost rises with output (materials, labour). Raising fixed cost lifts ATC but never touches MC or AVC — so it can't change the profit-maximizing quantity, only whether that quantity is profitable.</p></div>
+      <div class="exitem"><h3>The firm is always a price-taker</h3>
+        <p>In a competitive market the firm is too small to move the price; it takes the going price as given and chooses only <em>how much</em> to make. In this tool the short-run price slider lets <b>you</b> stand in for the market and try different prices the firm might face — it is not the firm setting its own price. In the long run even that market price is no longer free: entry and exit pin it down.</p></div>
+      <div class="exitem"><h3>Profit</h3>
+        <p>Profit = (P − ATC) × q, the shaded rectangle. The firm picks q where P = MC, because that's where the last unit's revenue just covers its marginal cost; producing more or less would shrink the rectangle.</p></div>
+      <div class="exitem span2"><h3>Short run vs. long run — the key distinction</h3>
+        <p>In <b>both</b> horizons the firm is a price-taker. The difference is what the price is free to be. In the <b>short run</b> the market price can be anything (we let you explore it), fixed cost is already sunk, and the firm keeps producing as long as the price clears <b>AVC</b> — even at a loss, because any revenue above variable cost chips away at the fixed bill. Its short-run supply curve is therefore MC above minimum AVC.</p>
+        <p>In the <b>long run</b> nothing is sunk and firms can enter or leave freely. The part of MC <b>below minimum ATC is <em>not</em> part of the long-run supply curve</b> — no firm would operate there, because it can't cover all its costs. Economic profits pull new firms in (market supply shifts right, price falls) and losses drive firms out (price rises); this entry/exit stops only when the price is pushed all the way to <b>minimum ATC</b>. There every surviving firm produces at efficient scale where <b>P = MC = ATC</b>, so <b>economic profit is exactly zero</b>.</p></div>
+    </div>`;
+  $("#fexplaincard").innerHTML=firmExplain;
+
+  // wiring
+  function fillTrack(input,frac,color){const p=Math.round(frac*100);input.style.setProperty("--trk",`linear-gradient(90deg,${color} 0 ${p}%,#cdd6de ${p}% 100%)`);}
+  function syncFills(){
+    fillTrack($("#fp"),(F.p-10)/90,"var(--price)");
+    fillTrack($("#ffc"),F.fc/120,"var(--ink)");
+    $("#fpVal").textContent=money(F.p);
+    $("#ffcVal").textContent=money(F.fc);
+  }
+  function applyRunUI(){
+    const lr=F.run==="LR";
+    $("#fpCtrl").style.display=lr?"none":"";
+    const note=$("#lrNote"); note.style.display=lr?"":"none";
+    if(lr){ const p=Math.round(minATC(F.fc).price);
+      note.innerHTML=`Price isn't yours to set in the long run — entry and exit drive it to <b>minimum ATC = ${money(p)}</b>, the zero-profit price. Adjust fixed cost to move it.`; }
+  }
+  function bindSlider(id,key){const el=$("#"+id);el.value=F[key];el.addEventListener("input",()=>{F[key]=+el.value;syncFills();if(F.run==="LR")applyRunUI();renderFirm();});}
+  bindSlider("fp","p"); bindSlider("ffc","fc");
+
+  document.querySelectorAll("#firmRun button").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      F.run=btn.dataset.v;
+      document.querySelectorAll("#firmRun button").forEach(b=>b.setAttribute("aria-pressed",b===btn?"true":"false"));
+      applyRunUI(); renderFirm();
+    });
+  });
+  document.querySelectorAll("#flayers .chip").forEach(chip=>{
+    chip.addEventListener("click",()=>{flayers[chip.dataset.k]=!flayers[chip.dataset.k];chip.setAttribute("aria-pressed",flayers[chip.dataset.k]?"true":"false");renderFirm();});
+  });
+  const fp={profit:{p:60},loss:{p:28},shutdown:{p:15},breakeven:{p:minATC(60).price}};
+  document.querySelectorAll("#fpresets button").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const v=fp[btn.dataset.fp]; if(!v) return;
+      F.run="SR";
+      document.querySelectorAll("#firmRun button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v==="SR"?"true":"false"));
+      if(btn.dataset.fp==="breakeven"){ F.fc=60; $("#ffc").value=60; v.p=minATC(60).price; }
+      F.p=v.p; $("#fp").value=v.p; applyRunUI(); syncFills(); renderFirm();
+    });
+  });
+
+  window.__firm = { render: renderFirm, applyRunUI };
+  // init
+  applyRunUI(); syncFills(); renderFirm();
+})();
+
+</script>
+<script>
+(function(){
+  const $=s=>document.querySelector(s);
+  const tabs=[...document.querySelectorAll(".tabbar button")];
+  const title=$("#appTitle"), sub=$("#appSub");
+  const TITLES={none:"Market Equilibrium & Welfare",tax:"Market Equilibrium & Welfare",
+    subsidy:"Market Equilibrium & Welfare",externality:"Market Equilibrium & Welfare",
+    firm:"Costs & Profit Maximization"};
+  function activate(tab){
+    const isFirm = tab==="firm";
+    tabs.forEach(b=>b.setAttribute("aria-selected", b.dataset.tab===tab?"true":"false"));
+    $("#marketSection").style.display = isFirm? "none":"grid";
+    $("#firmSection").style.display   = isFirm? "grid":"none";
+    $("#mexplaincard").style.display  = isFirm? "none":"";
+    $("#fexplaincard").style.display  = isFirm? "":"none";
+    $("#firmRun").style.display       = isFirm? "":"none";
+    sub.style.display = isFirm? "none":"";
+    title.textContent = TITLES[tab];
+    if(isFirm){ window.__firm && window.__firm.render(); }
+    else { window.__market && window.__market.setMode(tab); }
+    window.scrollTo(0,0);
+  }
+  tabs.forEach(b=>b.addEventListener("click",()=>activate(b.dataset.tab)));
+  activate("none");
+})();
+</script>
+<script>
+  // typeset the LaTeX in the model-notes once KaTeX's auto-render has loaded
+  window.addEventListener("DOMContentLoaded", function(){
+    if(!window.renderMathInElement) return;
+    var opts={delimiters:[{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false};
+    ["#mexplaincard","#fexplaincard"].forEach(function(sel){
+      var el=document.querySelector(sel);
+      if(el) try{ renderMathInElement(el,opts); }catch(e){}
+    });
+  });
+</script>
+</body>
+</html>
