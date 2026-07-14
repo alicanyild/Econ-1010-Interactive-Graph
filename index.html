@@ -480,7 +480,7 @@
       <p>An external effect of \(e\) per unit shifts the relevant private curve to a social one — MSC for a production effect, MSB for a consumption effect. The efficient quantity is where \(\text{MSB} = \text{MSC}\); the gap from the market quantity creates \(\dfrac{1}{2}\cdot\dfrac{e^{2}}{b+d}\) of deadweight loss, which a Pigouvian tax or subsidy of \(e\) would remove.</p></div>
     <div class="exitem span2"><h3>Price controls</h3>
       <p>A ceiling \(\bar P\) binds only when \(\bar P < P^{*}\); a floor \(\underline P\) binds only when \(\underline P > P^{*}\). At the controlled price the quantities are \(Q_d = \dfrac{a-P}{b}\) and \(Q_s = \dfrac{P-c}{d}\); a ceiling leaves a <b>shortage</b> \(Q_d - Q_s\) and a floor a <b>surplus</b> \(Q_s - Q_d\). The short side rations the market, so trade is \(Q_t = \min(Q_d, Q_s)\).</p>
-      <p>Because the price no longer clears the market, a wedge opens at \(Q_t\) between what the marginal buyer would pay, \(D(Q_t)\), and what the marginal seller would accept, \(S(Q_t)\) — and <b>nobody collects it</b>. Under a ceiling the good is cheap but scarce, so buyers compete for it by queueing, searching and waiting; under a floor buyers are scarce, so sellers compete for them with idle capacity and wasteful quality. Either way the rectangle \([\,D(Q_t) - S(Q_t)\,]\cdot Q_t\) is dissipated: it is the <b>total value of wasted time</b>, not a transfer. What is left is the consumer-surplus triangle above \(D(Q_t)\), equal to \(\tfrac{1}{2}bQ_t^{2}\), and the producer-surplus triangle below \(S(Q_t)\), equal to \(\tfrac{1}{2}dQ_t^{2}\).</p>
+      <p>Because the price no longer clears the market, a wedge opens at \(Q_t\) between what the marginal buyer would pay, \(D(Q_t)\), and what the marginal seller would accept, \(S(Q_t)\) — and <b>nobody collects it</b>. Under a ceiling the good is cheap but scarce, so buyers compete for it by queueing, searching and waiting; under a floor buyers are scarce, so sellers compete for them with idle capacity and wasteful quality. Either way the rectangle \([\,D(Q_t) - S(Q_t)\,]\cdot Q_t\) is dissipated: it is the <b>total value of wasted resources</b>, not a transfer. What is left is the consumer-surplus triangle above \(D(Q_t)\), equal to \(\tfrac{1}{2}bQ_t^{2}\), and the producer-surplus triangle below \(S(Q_t)\), equal to \(\tfrac{1}{2}dQ_t^{2}\).</p>
       <p>On top of that, the units between \(Q_t\) and \(Q^{*}\) are never traded at all — the familiar lost gains from trade, \(\tfrac{1}{2}(Q^{*}-Q_t)\,[\,D(Q_t)-S(Q_t)\,]\). The accounting closes exactly: \(CS + PS + \text{wasted time} + DWL = \) free-market total surplus. (This is the full-dissipation benchmark. If buyers waste less than the whole wedge — say the queue is short, or a black market re-sells the good — part of the rectangle survives as a transfer instead of vanishing.)</p></div>
   </div>
 </section>
@@ -907,7 +907,7 @@ function renderPC(m){
     if(layers.cs && Qt>8 && (a-Dq)>9) svg += regLabel([[0,Dq],[0,a],[Qt,Dq]], "CS", "var(--demand)");
     if(layers.ps && Qt>8 && (Sq-c)>9) svg += regLabel([[0,c],[0,Sq],[Qt,Sq]], "PS", "var(--supply)");
     if(layers.gov && binding && wedge>7 && Qt>18)
-      svg += regLabel([[0,Sq],[0,Dq],[Qt,Dq],[Qt,Sq]], ceiling?"Value of wasted time":"Wasted resources", ctrlCol);
+      svg += regLabel([[0,Sq],[0,Dq],[Qt,Dq],[Qt,Sq]], ceiling?"Wasted resources", ctrlCol);
     if(layers.dwl && binding && Math.abs(Qe-Qt)>3) svg += regLabel([[Qt,Dq],[Qe,Pe],[Qt,Sq]], "DWL", "var(--dwl)");
 
     // ---- curves ----
@@ -1175,7 +1175,7 @@ function updatePanelPC(m){
       $("#stats").innerHTML=""; $("#wtable").innerHTML=""; return;
     }
     const ceil=m.ceiling, side=ceil?"ceiling":"floor";
-    const wasteLab = ceil?"Value of wasted time":"Wasted resources";
+    const wasteLab = ceil?"Wasted resources";
     if(!m.binding){
       ins.innerHTML=`<span class="lead">Price ${side}</span>`+
         `At <b>${money(m.pc)}</b> the ${side} sits ${ceil?"above":"below"} the <b>${money(m.Pe)}</b> equilibrium, so it <b>doesn't bind</b> — the market still clears at <b>${money(m.Pe)}</b> with <b>${num(m.Qe)}</b> units traded, nothing is wasted, and there is no deadweight loss. Drag it ${ceil?"below":"above"} ${money(m.Pe)} to make it bite.`;
@@ -1268,7 +1268,7 @@ function wrow(name,before,after){
       $("#govChipLabel").textContent = S.extSign==="neg" ? "External cost" : "External benefit";
     }
     if(S.mode==="pricecontrol"){
-      $("#govChipLabel").textContent = S.pcType==="ceiling" ? "Wasted time" : "Wasted resources";
+      $("#govChipLabel").textContent = S.pcType==="ceiling" ?"Wasted resources";
     }
   }
 
@@ -1339,7 +1339,7 @@ function wrow(name,before,after){
   function applyModeChips(){
     const isSub=S.mode==="subsidy", isExt=S.mode==="externality", isPC=S.mode==="pricecontrol", isNone=S.mode==="none";
     $("#govChipLabel").textContent = isExt ? (S.extSign==="neg"?"External cost":"External benefit")
-                                   : isPC ? (S.pcType==="ceiling"?"Wasted time":"Wasted resources")
+                                   : isPC ? (S.pcType==="ceiling"?"Wasted resources")
                                    : isSub ? "Govt spending" : "Tax revenue";
     $("#govChip").dataset.mode = isPC ? "pc" : "std";
     $("#govChip").style.display = isNone ? "none" : "";   // the wasted-time rectangle is the price-control analogue
