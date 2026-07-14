@@ -1,1 +1,1 @@
-A dynamic, interactive learning tool designed to help Introduction to Microeconomics students understand some microeconomic concepts visually. Users can manipulate linear supply and demand equations to simulate several scenarios.
+A dynamic, interactive learning tool designed to help undergraduate students of Introduction to Microeconomics understand some microeconomic concepts visually. Students can manipulate linear supply and demand equations to simulate several scenarios and compare it to the free-market equilibrium.
