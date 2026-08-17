@@ -1,1 +1,1 @@
-A dynamic, interactive learning tool designed for undergraduate students of Introduction to Microeconomics. Students can manipulate linear supply and demand equations to simulate several scenarios and compare them to the free-market equilibrium.
+A dynamic, interactive learning tool designed for undergraduate students of Introduction to Microeconomics (Econ 101). Students can manipulate linear supply and demand equations to simulate several scenarios and compare them to the free-market equilibrium.
